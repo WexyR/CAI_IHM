@@ -57,7 +57,7 @@ class Screen(Observer):
                 raise AssertionError
         subprocess.call(["aplay", model.get_gamme()[key]])
         if self.info :
-            self.info.config(text = "Vous avez joue la note : " + key + str(model.get_degree()))
+            self.info.config(text = "Vous avez joué la note : " + key + str(model.get_degree()))
 
 class Keyboard :
     def __init__(self,parent,model) :
