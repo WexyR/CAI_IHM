@@ -21,14 +21,17 @@ cursor.execute("CREATE TABLE frequencies ( \
 );")
 
 
-f0=440.0
-frequencies=[]
-octave=[]
-octave.append(3)
-for j in range (-9,3) :
-    frequency=f0*2**(j/12)
-    octave.append(frequency)
-frequencies.append(octave)
+def loadOctave(f0, index):
+    frequencies=[]
+    octave=[]
+    octave.append(index)
+    for j in range (-9,3) :
+        frequency=f0*2**(j/12)
+        octave.append(frequency)
+    frequencies.append(octave)
 
-cursor.executemany("INSERT INTO frequencies VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);", frequencies)
-connect.commit()
+    cursor.executemany("INSERT INTO frequencies VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);", frequencies)
+    connect.commit()
+
+for i in range(0,7):
+    loadOctave(440.0*2**(i-3), i)
