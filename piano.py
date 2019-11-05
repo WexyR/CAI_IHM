@@ -117,8 +117,8 @@ class Piano :
 
 if __name__ == "__main__" :
     root = Tk()
-    root.geometry("560x300")
-    octaves=2
+    octaves=3
+    root.geometry(str(280*octaves)+"x300")
     root.title("La leçon de piano à "+ str(octaves) + " octaves")
     piano=Piano(root,octaves)
     piano.packing()
