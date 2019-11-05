@@ -31,7 +31,7 @@ class Octave(Subject) :
         notes=["C","D","E","F","G","A","B","C#","D#","F#","G#","A#"]
         self.gamme=collections.OrderedDict()
         for key in notes :
-            self.gamme[key]="../Sounds/"+key+str(degree)+".wav"
+            self.gamme[key]="Sounds/"+key+str(degree)+".wav"
         return self.gamme
     def get_gamme(self) :
         return self.gamme

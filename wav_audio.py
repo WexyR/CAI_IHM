@@ -27,20 +27,20 @@ import subprocess
   sorties :
     data = liste des échantillons
     framerate = fréquence d'échantillonage
-    return 
+    return
 """
 def open_wav(filename):
     data=[]                                      # liste des échantillons, vide si fichier pas mono ou pas sur 16 bits
-    file=wave.open(filename,'rb')                # ouverture du fichier en lecture
+    file=wave.open("Sounds/"+filename,'rb')                # ouverture du fichier en lecture
     framerate = file.getframerate()           # fréquence d'échantillonnage
 ##    if (file.getnchannels() != 1):               # test Mono
 ##        print('Le fichier son doit être mono.')
 ##    elif (file.getsampwidth() != 2):             # test profondeur encodage 16 bits
-##        print('Le fichier son doit être encodé sur 16 bits. (Ici: '+str(8*file.getsampwidth())+' bits.)')         
+##        print('Le fichier son doit être encodé sur 16 bits. (Ici: '+str(8*file.getsampwidth())+' bits.)')
 ##    else :
     for i in range(file.getnframes()):            # parcours de la suite des échantillons ( getnframes() = nombre total d'échantillons )
         value = file.readframes(1)                # lecture d'un échantillon et passage au suivant
-        data.append(struct.unpack("=h",value)[0]) # formule auto-magique pour le décodage...         
+        data.append(struct.unpack("=h",value)[0]) # formule auto-magique pour le décodage...
     file.close()
     return data,framerate
 
@@ -53,7 +53,7 @@ def open_wav(filename):
     sampling = fréquence d'échantillonnage : 8000, 11025, 22050, 41 000, 44100 et éventuellement 48000 et 96000
 '''
 def save_wav(filename,data,framerate):
-    file = wave.open(filename,'w')
+    file = wave.open("Sounds/"+filename,'w')
     # création en-tête
     channels = 1                                                            # mono
     n_bytes = 2                                                             # taille d'un échantillon : 2 octets = 16 bits
@@ -66,7 +66,7 @@ def save_wav(filename,data,framerate):
         data[i] = int(data[i]) # au cas où une valeur non entière traînerait...
         # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
         if data[i]<-32767 : data[i]=-32767
-        elif data[i]>32767: data[i]=32767                   
+        elif data[i]>32767: data[i]=32767
         file.writeframes(wave.struct.pack('h',data[i])) # codage et écriture échantillon 16 bits signés
     print("saving WAV file : '"+filename+"' done !")
     file.close()
@@ -81,7 +81,7 @@ def save_wav(filename,data,framerate):
   sorties :
     data = liste des échantillons
 '''
-def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):   
+def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):
     data =[int(30000*math.cos(2*math.pi*f*i/framerate)) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
     save_wav(file,data,framerate)
     return data
@@ -89,7 +89,7 @@ def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):
 if  __name__ == "__main__" :
     wav_sinus('A2.wav',220,8000,1)
     wav_sinus('A3.wav',440,8000,1)
-    subprocess.call(["aplay", "A2.wav"])
-    subprocess.call(["aplay", "A3.wav"])
+    subprocess.call(["aplay", "Sounds/"+"A2.wav"])
+    subprocess.call(["aplay", "Sounds/"+"A3.wav"])
     data,framerate=open_wav("A2.wav")
     print(framerate,data[0],data[1])
