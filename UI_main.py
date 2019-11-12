@@ -1,11 +1,11 @@
 import sys
 if sys.version_info.major == 2:
     print(sys.version)
-    from Tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Notebook
+    from Tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Notebook,TopLevel
     import tkFileDialog as filedialog
 else:
     print(sys.version)
-    from tkinter import Tk,Frame,Button,Label,LabelFrame,Menu
+    from tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Toplevel
     from tkinter.ttk import Notebook
     from tkinter import filedialog
 
@@ -76,10 +76,12 @@ class UI_Main (Tk):
         #                         Fenêtre Affichage
         ######################################################################
 
-        #frame3 = LabelFrame(self, text="Affichage des notes", padx=20, pady=20);
-        #frame3.pack(fill="both", expand="yes")
+        self.plotter_frame = Toplevel(self)
+        self.plotter_frame.geometry("400x200")
+        self.plotter_frame.disabled = 1
+        self.plotter_frame.title("Affichage des notes");
 
-        #label3 = Label(frame3, text="Affichage ici").pack()
+        label3 = Label(self.plotter_frame, text="Affichage ici").pack()
 
         ######################################################################
         #                          Mode Clavier
