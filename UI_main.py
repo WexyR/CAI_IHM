@@ -9,32 +9,45 @@ else:
     from tkinter.ttk import Notebook
     from tkinter import filedialog
 
-class UI_Main:
+class UI_Main (Tk):
     def __init__(self):
-        root = Tk()
-        root.geometry("600x350")
-        root.title("La leçon de piano - Beta Version - Do not distribute")
+        Tk.__init__(self)
+
+        self.geometry("600x350")
+        self.title("La leçon de piano - Beta Version - Do not distribute")
 
         ######################################################################
         #                           Menus
         ######################################################################
 
         menu_bar = Menu()
-        root.config(menu = menu_bar)
+        self.config(menu = menu_bar)
 
         file_menu = Menu(menu_bar, tearoff=0)
-        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Quitter")
+        menu_bar.add_cascade(label="Fichier", menu=file_menu)
 
         edition_menu = Menu(menu_bar, tearoff=0)
-        menu_bar.add_cascade(label="Edit", menu=file_menu)
+        edition_menu.add_command(label="Regenérer Tout")
+        edition_menu.add_command(label="Rétablir Défaut")
+        menu_bar.add_cascade(label="Edition", menu=edition_menu)
 
         window_menu = Menu(menu_bar, tearoff=0)
-        menu_bar.add_cascade(label="Window", menu=window_menu)
+        window_submenu1 = Menu(window_menu, tearoff=0)
+        window_submenu1.add_command(label="Afficheur Onde")
+        window_submenu1.add_command(label="Afficheur Harmonique")
+        window_menu.add_cascade(label="Ouvrir Vue", menu=window_submenu1)
+        window_menu.add_command(label="Ouvrir Tout")
+        window_menu.add_separator()
+        window_menu.add_command(label="Rétablir défaut")
+        menu_bar.add_cascade(label="Fenêtre", menu=window_menu)
 
         help_menu = Menu(menu_bar, tearoff=0)
-        menu_bar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="Support")
+        help_menu.add_command(label="Crédits")
+        menu_bar.add_cascade(label="Aide", menu=help_menu)
 
-        subframe_menu = Notebook(root)
+        subframe_menu = Notebook(self)
         subframe_menu.pack(fill="both", expand="yes")
 
         ######################################################################
@@ -42,7 +55,7 @@ class UI_Main:
         ######################################################################
 
         frame0 = Frame(subframe_menu)
-        frame0.pack(fill="both", expand="yes", ipadx=20, ipady=20)
+        frame0.pack()
         subframe_menu.add(frame0, text="Génération")
 
         frame1 = LabelFrame(frame0, text="Génération de la note", padx=20, pady=20);
@@ -63,7 +76,7 @@ class UI_Main:
         #                         Fenêtre Affichage
         ######################################################################
 
-        #frame3 = LabelFrame(root, text="Affichage des notes", padx=20, pady=20);
+        #frame3 = LabelFrame(self, text="Affichage des notes", padx=20, pady=20);
         #frame3.pack(fill="both", expand="yes")
 
         #label3 = Label(frame3, text="Affichage ici").pack()
@@ -73,13 +86,11 @@ class UI_Main:
         ######################################################################
 
         frame4 = LabelFrame(subframe_menu, text="Clavier", padx=20, pady=20);
-        frame4.pack(fill="both", expand="yes")
-        subframe_menu.add(frame0, text="Clavier")
+        frame4.pack()
+        subframe_menu.add(frame4, text="Clavier")
 
         label4 = Label(frame4, text="Clavier ici").pack()
 
-        root.mainloop()
-
-
 if __name__ == "__main__":
     app = UI_Main()
+    app.mainloop()
