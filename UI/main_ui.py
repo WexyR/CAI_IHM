@@ -9,7 +9,7 @@ else:
     from tkinter.ttk import Notebook
     from tkinter import filedialog
 
-class UI_Main (Tk):
+class MainUI (Tk):
     """This is the main UI class. It is responsible for the module linking."""
 
     def on_closing(self):
@@ -110,7 +110,3 @@ class UI_Main (Tk):
 
     def toggleToplevel(level):
         self.plotter_frame.deiconify()
-
-if __name__ == "__main__":
-    app = UI_Main()
-    app.mainloop()
