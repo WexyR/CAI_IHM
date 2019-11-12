@@ -1,10 +1,12 @@
-#Requirements
+# CAI-Piano
+
+## Requirements
 
 - python3
 - python3-qt
 - alsa-utils
 
-# Running the application
+## Running the application
 
 Run in a terminal:
 ```python3 piano.py```
