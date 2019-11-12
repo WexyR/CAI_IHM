@@ -21,11 +21,11 @@ import subprocess
 #sys.path.append("./Sounds")
 
 class Octave(Subject) :
-    def __init__(self,degree=3) :
+    def __init__(self,degree) :
         Subject.__init__(self)
         self.degree=degree
         self.set_gamme(degree)
-    def set_gamme(self,degree=3) :
+    def set_gamme(self,degree) :
         self.degree=degree
         folder="Sounds"
         notes=["C","D","E","F","G","A","B","C#","D#","F#","G#","A#"]
@@ -101,7 +101,7 @@ class Piano :
         self.frame=Frame(self.parent,bg="yellow")
         for octave in range(octaves) :
             self.create_octave(self.frame,octave+2)
-    def create_octave(self,parent,degree=3) :
+    def create_octave(self,parent,degree) :
         frame=Frame(parent,bg="green")
         model=Octave(degree)
         self.octaves.append(model)
@@ -118,7 +118,7 @@ class Piano :
 if __name__ == "__main__" :
     root = Tk()
     root.geometry("560x300")
-    octaves=2
+    octaves=4
     root.title("La leçon de piano à "+ str(octaves) + " octaves")
     piano=Piano(root,octaves)
     piano.packing()
