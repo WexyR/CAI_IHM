@@ -13,8 +13,13 @@ else:
 
 import collections
 
-
 from observer  import *
+
+print("Génération des notes du piano")
+
+from frequencies import *
+
+from wav_create_notes_from_frequencies_db import *
 
 import subprocess
 #import sys
