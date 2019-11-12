@@ -1,13 +1,10 @@
 import sys
-if sys.version_info.major == 2:
-    print(sys.version)
-    from Tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Notebook,TopLevel
-    import tkFileDialog as filedialog
-else:
-    print(sys.version)
-    from tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Toplevel,messagebox
-    from tkinter.ttk import Notebook
-    from tkinter import filedialog
+
+from tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Toplevel,messagebox
+from tkinter.ttk import Notebook
+from tkinter import filedialog
+
+from UI.piano_interface import Piano
 
 class MainUI (Tk):
     """This is the main UI class. It is responsible for the module linking."""
@@ -62,7 +59,9 @@ class MainUI (Tk):
         frame4.pack()
         subframe_menu.add(frame4, text="Clavier")
 
-        label4 = Label(frame4, text="Clavier ici").pack()
+        octaves = 2
+        piano = Piano(frame4, octaves)
+        piano.packing()
 
         ######################################################################
         #                         Fenêtre Affichage
@@ -110,3 +109,7 @@ class MainUI (Tk):
 
     def toggleToplevel(level):
         self.plotter_frame.deiconify()
+
+if __name__ == "__main__":
+    app = MainUI()
+    app.mainloop()

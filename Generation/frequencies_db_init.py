@@ -33,5 +33,5 @@ def loadOctave(f0, index):
     cursor.executemany("INSERT INTO frequencies VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);", frequencies)
     connect.commit()
 
-for i in range(0,7):
+for i in range(0,4):
     loadOctave(440.0*2**(i-3), i)

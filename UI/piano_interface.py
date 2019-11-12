@@ -12,11 +12,11 @@ else:
     from tkinter import filedialog
 
 import collections
-
-
-from observer  import *
-
 import subprocess
+import os
+
+from observer import *
+
 
 class Octave(Subject) :
     def __init__(self,degree=3) :
@@ -53,7 +53,10 @@ class Screen(Observer):
         if __debug__:
             if key not in model.gamme.keys()  :
                 raise AssertionError
-        subprocess.call(["aplay", model.get_gamme()[key]])
+        if(os.path.exists("./Sounds/"+model.get_gamme()[key])):
+            subprocess.call(["aplay", "./Sounds/"+model.get_gamme()[key]])
+        else:
+            print("Le fichier "+model.get_gamme()[key]+" n'est pas généré.")
         if self.info :
             self.info.config(text = "Vous avez joué la note : " + key + str(model.get_degree()))
 
