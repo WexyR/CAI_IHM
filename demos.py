@@ -26,7 +26,13 @@ if __name__ == "__main__":
     elif(arg == '2'):
         from UI.IHM_visualizer import *
         mw = Tk()
-        IHM = NoteSelector(mw)
+
+        view=View(mw)
+        s = Signal("Note")
+        s.attach(view)
+        IHM = NoteSelector(mw, model=s)
         IHM.create_UI()
         IHM.pack()
+        view.grid(4)
+        view.packing()
         mw.mainloop()

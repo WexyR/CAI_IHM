@@ -17,14 +17,17 @@ class Signal(Subject):
     """Signal class"""
     def __init__(self, name, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0):
         Subject.__init__(self)
+        self.set(name, magnitude, frequency, phase, N_harm)
+
+        self.values = None
+
+    def set(self, name, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0):
         self.name = name
 
         self.magnitude = magnitude
         self.frequency = frequency
         self.phase = phase
         self.N_harm = N_harm
-
-        self.values = None
 
     def harmonize(self, t, N=0):
         a,f,p=self.magnitude,self.frequency,self.phase
@@ -57,6 +60,8 @@ class View(Observer):
         self.plot_signal(subject.values, subject.name)
 
     def plot_signal(self,signal,name,color="red"):
+        if (signal is None or len(signal)==0):
+            self.canvas.delete(name)
         w,h=self.width,self.height
         signal_id=None
         if signal and len(signal) > 1:

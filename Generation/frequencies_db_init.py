@@ -20,6 +20,22 @@ cursor.execute("CREATE TABLE frequencies ( \
                     B float\
 );")
 
+def getNoteFreq(note, octave=None, sharp=False):
+    assert isinstance(note, str)
+    l_note = len(note)
+    assert l_note > 0 and l_note <= 3
+    assert note[0] in "ABCDEFG"
+    if l_note >= 2:
+        if "#" in note:
+            sharp = True
+            note = note.replace('#', '')
+        octave = int(note[-1])
+        note = note[0]
+
+    if octave is None: raise ValueError("octave can not be None")
+    assert isinstance(octave, int)
+
+    return cursor.execute("SELECT {0}{1} FROM frequencies WHERE octave={2};".format(note, ("", "Sharp")[int(sharp)], octave)).fetchone()[0]
 
 def loadOctave(f0, index):
     frequencies=[]
