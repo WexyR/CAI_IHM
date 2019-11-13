@@ -74,7 +74,7 @@ class NoteSelector(Frame):
             indexes = registered_keys.curselection()
             if(indexes): registered_keys.delete(*indexes)
             self.model.values = None
-            self.model.generate()
+            self.model.notify()
         def insert_key(event=None):
             name = keyvar.get() + sharpvar.get() + octave.get()
             freq = getNoteFreq(name)
