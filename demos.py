@@ -26,7 +26,14 @@ if __name__ == "__main__":
     elif(arg == '2'):
         from UI.IHM_visualizer import *
         mw = Tk()
+
+        view=View(mw)
         IHM = NoteSelector(mw)
         IHM.create_UI()
         IHM.pack()
+        chorder = ChordSelector(IHM, [view])
+        chorder.create_UI()
+        chorder.pack()
+        view.grid(4)
+        view.packing()
         mw.mainloop()
