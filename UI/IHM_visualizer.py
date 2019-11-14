@@ -58,6 +58,7 @@ class NoteSelector(Frame):
         if (S.isdigit()):
             if(int(P)>=2 and int(P)<=5):
                 result = True
+        if not result: self.bell()
         return result
 
     def _validate_spinbox_harm(self, S, P):
@@ -66,6 +67,7 @@ class NoteSelector(Frame):
         result = False
         if (S.isdigit()):
                 result = True
+        if not result: self.bell()
         return result
 
     def create_UI(self):
@@ -167,4 +169,4 @@ class ChordSelector(Frame):
             for v in self.views:
                 sig.attach(v)
             registered_keys.insert(0, sig)
-        Button(self, text="AddNote", command=AddNote).grid(row=0)
+        Button(self, text="AddNote", command=AddNote).grid(row=0, column=1)
