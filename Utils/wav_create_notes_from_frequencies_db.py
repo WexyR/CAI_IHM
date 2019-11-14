@@ -39,11 +39,12 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
 
     values = []
     for i in range(0,nb_samples):
+        k=min(1,5*i/sampling)*min(1,5*(nb_samples-i)/sampling)
         # canal gauche
         # 127.5 + 0.5 pour arrondir à l'entier le plus proche
-        left_value = wave.struct.pack('B',int(128.0 + left_magnitude*math.sin(2.0*math.pi*left_frequency*i/sampling)))
+        left_value = wave.struct.pack('B',int(128.0 + k*left_magnitude*math.sin(2.0*math.pi*left_frequency*i/sampling)))
         # canal droit
-        right_value = wave.struct.pack('B',int(128.0 + right_magnitude*math.sin(2.0*math.pi*right_frequency*i/sampling)))
+        right_value = wave.struct.pack('B',int(128.0 + k*right_magnitude*math.sin(2.0*math.pi*right_frequency*i/sampling)))
         values.append(left_value)
         values.append(right_value) # écriture frame
     value_str = b''.join(values)
