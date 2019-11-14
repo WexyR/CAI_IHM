@@ -4,7 +4,7 @@ from tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Toplevel,messagebox
 from tkinter.ttk import Notebook
 from tkinter import filedialog
 
-from UI.piano_interface import Piano
+from UI.piano_mvc import Piano
 
 class MainUI (Tk):
     """This is the main UI class. It is responsible for the module linking."""

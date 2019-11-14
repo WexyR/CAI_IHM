@@ -53,8 +53,8 @@ class Screen(Observer):
         if __debug__:
             if key not in model.gamme.keys()  :
                 raise AssertionError
-        if(os.path.exists("./Sounds/"+model.get_gamme()[key])):
-            subprocess.call(["aplay", "./Sounds/"+model.get_gamme()[key]])
+        if(os.path.exists(model.get_gamme()[key])):
+            subprocess.call(["aplay", model.get_gamme()[key]])
         else:
             print("Le fichier "+model.get_gamme()[key]+" n'est pas généré.")
         if self.info :

@@ -5,8 +5,10 @@
 # (C) Fabrice Sincère ; Jean-Claude Meilland
 import wave
 import math
+import sys
 
 import sqlite3
+import Generation.frequencies_db_init
 
 ## Création d'un fichier audio au format WAV (PCM 8 bits stéréo 44100 Hz)
 ## Son de forme sinusoïdale sur chaque canal
@@ -43,10 +45,16 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
 
     sound.close()
 
-connect = sqlite3.connect("frequencies.db")
+connect = sqlite3.connect("Generation/frequencies.db")
 cursor = connect.cursor()
 gammes=cursor.execute("SELECT * FROM frequencies")
 notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+n_note = cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()*len(notes)
+j=0
 for gamme in gammes :
-     for i in range(1,len(gamme)) :
-                    create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
+    for i in range(1,len(gamme)) :
+        j+=1
+        if not os.path.exists("Sounds/"+notes[i]+gamme[0]+".wav"):
+            print("Generating {0}/{1}".format(j, n_note))
+            create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
+print("Done loading {0} sounds!".format(cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()[0]*len(notes)))
