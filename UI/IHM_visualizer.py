@@ -46,12 +46,6 @@ class NoteSelector(Frame):
         octave.pack(side="left")
 
 
-
-
-
-
-
-
 if __name__ == "__main__":
     mw = Tk()
     IHM = NoteSelector(mw)
