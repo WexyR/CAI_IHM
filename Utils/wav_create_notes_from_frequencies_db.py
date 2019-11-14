@@ -5,8 +5,11 @@
 # (C) Fabrice Sincère ; Jean-Claude Meilland
 import wave
 import math
+import os
+import threading
 
 import sqlite3
+import Generation.frequencies_db_init
 
 ## Création d'un fichier audio au format WAV (PCM 8 bits stéréo 44100 Hz)
 ## Son de forme sinusoïdale sur chaque canal
@@ -24,6 +27,7 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
     duration = 1
     nb_samples = int(duration*sampling)
     params = (nb_channels,nb_bytes,sampling,nb_samples,'NONE','not compressed')
+
     sound.setparams(params)    # création de l'en-tête (44 octets)
 
     # niveau max dans l'onde positive : +1 -> 255 (0xFF)
@@ -33,27 +37,38 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
     left_magnitude = 127.5*left_level
     right_magnitude= 127.5*right_level
 
+    values = []
     for i in range(0,nb_samples):
+        k=min(1,5*i/sampling)*min(1,5*(nb_samples-i)/sampling)
         # canal gauche
         # 127.5 + 0.5 pour arrondir à l'entier le plus proche
-        left_value = wave.struct.pack('B',int(128.0 + left_magnitude*math.sin(2.0*math.pi*left_frequency*i/sampling)))
+        left_value = wave.struct.pack('B',int(128.0 + k*left_magnitude*math.sin(2.0*math.pi*left_frequency*i/sampling)))
         # canal droit
-        right_value = wave.struct.pack('B',int(128.0 + right_magnitude*math.sin(2.0*math.pi*right_frequency*i/sampling)))
-        sound.writeframes(left_value + right_value) # écriture frame
-
+        right_value = wave.struct.pack('B',int(128.0 + k*right_magnitude*math.sin(2.0*math.pi*right_frequency*i/sampling)))
+        values.append(left_value)
+        values.append(right_value) # écriture frame
+    value_str = b''.join(values)
+    sound.writeframes(value_str)
     sound.close()
 
-connect = sqlite3.connect("frequencies.db")
+connect = sqlite3.connect("Generation/frequencies.db")
 cursor = connect.cursor()
-gammes=cursor.execute("SELECT * FROM frequencies")
+gammes=cursor.execute("SELECT * FROM frequencies").fetchall()
 notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+n_note = cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()[0]*len(notes)
+j=0
+threads = []
+
+print("Generating wav files from frequencies db...")
+
 for gamme in gammes :
-     for i in range(1,len(gamme)) :
-                    create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
-##f0=440.0
-##notes=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-##i=0
-##for j in range (-9,3) :
-##    frequency=f0*2**(j/12)
-##    create_note_wav(notes[i],frequency,2*frequency)
-##    i=i+1
+    for i in range(1,len(gamme)) :
+        j+=1
+        if not os.path.exists("Sounds/"+notes[i]+str(gamme[0])+".wav"):
+            print("Generating {0}/{1} (Sounds/{2}.wav)".format(j, n_note, notes[i]+str(gamme[0])))
+            threads.append(threading.Thread(target=create_note_wav, args=(gamme[0],notes[i],gamme[i],2*gamme[i])))
+            threads[-1].start()
+            #create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
+for thread in threads :
+    thread.join()
+print("Done loading {0} sounds!".format(n_note))
