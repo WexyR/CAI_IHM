@@ -50,10 +50,3 @@ notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
 for gamme in gammes :
      for i in range(1,len(gamme)) :
                     create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
-##f0=440.0
-##notes=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-##i=0
-##for j in range (-9,3) :
-##    frequency=f0*2**(j/12)
-##    create_note_wav(notes[i],frequency,2*frequency)
-##    i=i+1
