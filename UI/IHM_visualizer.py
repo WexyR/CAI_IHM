@@ -12,15 +12,44 @@ else:
     from tkinter import Tk,Frame,StringVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox
     from tkinter import filedialog
 
+class ListboxValues(Listbox):
+    def __init__(self, *arg, **kwargs):
+        super().__init__(*arg, **kwargs)
+        self.values = []
+
+    def insert(self, *arg, **kwargs):
+        super().insert(*arg, **kwargs)
+        self.values.insert(*arg, **kwargs)
+
+    def get(self, start, end=None):
+        print((start, end))
+        if not isinstance(start, int): raise TypeError("start must be integer")
+        if not isinstance(end, int) and end is not None: raise TypeError("end must be integer or None")
+        names = super().get(start, end)
+        if end is not None:
+            return [(names[i], self.values[i]) for i in range(start,end+1)]
+        else:
+            return (names, self.values[start])
+
+    def delete(self, start, end=None):
+        print((start, end))
+        if not isinstance(start, int): raise TypeError("start must be integer")
+        if not isinstance(end, int) and end is not None: raise TypeError("end must be integer or None")
+        super().delete(start, end)
+        if end is not None:
+            for i in range(start, end):
+                del self.values[i]
+        else:
+            del self.values[start]
 
 
 
 class NoteSelector(Frame):
     """Note selection widget controller"""
 
-    def __init__(self, parent, model=None, *arg, **kwarg):
+    def __init__(self, parent, *arg, **kwarg):
         super().__init__(parent, *arg, **kwarg)
-        self.model = model
+        self.cursig = None
 
     def _validate_spinbox_octave(self, S, P):
         """[private] validation function of Spinbox widget"""
@@ -30,6 +59,7 @@ class NoteSelector(Frame):
             if(int(P)>=2 and int(P)<=5):
                 result = True
         return result
+
     def _validate_spinbox_harm(self, S, P):
         """[private] validation function of Spinbox widget"""
         if S == '' or P == '': return True
@@ -68,18 +98,73 @@ class NoteSelector(Frame):
         harmN = Spinbox(self, from_=0, to=20, validate="all",validatecommand=vcmd_spinbox_harm)
         harmN.grid(row=2, column=4)
 
-        registered_keys = Listbox(self)
-        registered_keys.grid(row=3, column=1)
-        def delete_key(event):
-            indexes = registered_keys.curselection()
-            if(indexes): registered_keys.delete(*indexes)
-            self.model.values = None
-            self.model.notify()
-        def insert_key(event=None):
+        def submit():
             name = keyvar.get() + sharpvar.get() + octave.get()
             freq = getNoteFreq(name)
-            registered_keys.insert(0,name)
-            self.model.set(name, 1, freq, N_harm=int(harmN.get()))
-            self.model.generate()
-        registered_keys.bind("<BackSpace>", delete_key)
-        Button(self, text="test", command=insert_key).grid(row=2, column=5)
+            N_harm = int(harmN.get())
+            self.cursig = Signal(frequency=freq, N_harm=N_harm, keyname=name)
+
+        Button(self, text="Valider", command=submit).grid(row=2, column=5)
+
+    def getCurSignal(self):
+        if(self.cursig):
+            return self.cursig
+        return None
+
+
+class ChordSelector(Frame):
+    """controler which selector"""
+
+    def __init__(self, noteselector, views):
+        super().__init__()
+        assert isinstance(views, list)
+        self.noteselector = noteselector
+        self.views = views
+    def create_UI(self):
+
+
+        def delete_listbox_values(listbox):
+            ind = listbox.curselection()
+            if not ind:return
+            linename, key = listbox.get(ind[0])
+            key.unset_values()
+            listbox.delete(ind[0])
+
+
+        registered_keys = ListboxValues(self)
+        registered_keys.grid(row=1, column=1)
+        registered_keys.bind("<BackSpace>", lambda event,l=registered_keys:delete_listbox_values(l))
+
+        displayed_keys = ListboxValues(self)
+        displayed_keys.grid(row=1, column=4)
+        displayed_keys.bind("<BackSpace>", lambda event,l=displayed_keys:delete_listbox_values(l))
+
+        def display():
+            ind = registered_keys.curselection()
+            if not ind: return
+            linename, key = registered_keys.get(ind[0])
+            if(ind):
+                displayed_keys.insert(0, key)
+                registered_keys.delete(ind[0])
+                key.generate()
+
+        Button(self, text="->", command=display).grid(row=1, column=3)
+
+        def undisplay():
+            ind = displayed_keys.curselection()
+            if not ind: return
+            linename, key = displayed_keys.get(ind[0])
+            if(ind):
+                registered_keys.insert(0, key)
+                displayed_keys.delete(ind[0])
+                key.unset_values()
+
+        Button(self, text="<-", command=undisplay).grid(row=1, column=2)
+
+        def AddNote():
+            sig = self.noteselector.getCurSignal()
+            if not sig: return
+            for v in self.views:
+                sig.attach(v)
+            registered_keys.insert(0, sig)
+        Button(self, text="AddNote", command=AddNote).grid(row=0)

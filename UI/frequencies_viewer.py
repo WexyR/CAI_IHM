@@ -1,4 +1,5 @@
 from math import sin,pi
+from random import choice
 from observer import *
 ## from pylab import linspace,sin
 
@@ -15,19 +16,26 @@ else:
 
 class Signal(Subject):
     """Signal class"""
-    def __init__(self, name, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0):
+    def __init__(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, keyname="", color=None):
         Subject.__init__(self)
-        self.set(name, magnitude, frequency, phase, N_harm)
+        self.set(magnitude, frequency, phase, N_harm, keyname)
 
         self.values = None
 
-    def set(self, name, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0):
-        self.name = name
+    def __str__(self):
+        return self.keyname + " f:" + str(int(self.frequency)) + " N:" + str(self.N_harm)
 
+    def set(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, keyname="", color=None):
         self.magnitude = magnitude
         self.frequency = frequency
         self.phase = phase
         self.N_harm = N_harm
+        self.keyname = keyname
+
+        if color is None:
+            self.color = "#" + "".join([choice("0123456789ABCDEF") for _ in range(6)])
+        else:
+            self.color = color
 
     def harmonize(self, t, N=0):
         a,f,p=self.magnitude,self.frequency,self.phase
@@ -37,9 +45,12 @@ class Signal(Subject):
         Tech = period/samples
         print("Tech",Tech,period,samples)
         self.values = [(t*Tech,self.harmonize(t*Tech, self.N_harm)) for t in range(int(samples)+1)]
-        print(self.values)
         self.notify()
         return self.values
+
+    def unset_values(self):
+        self.values.clear()
+        self.notify()
 
 class View(Observer):
     def __init__(self,parent,bg="white",width=600,height=300):
@@ -53,21 +64,32 @@ class View(Observer):
 
     def update(self, subject=None):
         print("View : update()")
-        if subject.name not in self.signals.keys():
-            self.signals[subject.name] = subject.values
+        print(subject)
+        if "id"+str(id(subject)) not in self.signals.keys():
+            print("update not in keys")
+            self.signals["id"+str(id(subject))] = subject
         else:
-            self.canvas.delete(subject.name)
-        self.plot_signal(subject.values, subject.name)
+            print("update in keys -> delete curve")
+            self.canvas.delete("id"+str(id(subject)))
+        self.plot_signal(subject, "id"+str(id(subject)))
 
-    def plot_signal(self,signal,name,color="red"):
-        if (signal is None or len(signal)==0):
+    def plot_signal(self,signal,name):
+        if signal.color:
+            color = signal.color
+        else:
+            color= "red"
+        print(name)
+        if (signal.values is None or len(signal.values)==0):
+            print("values is None")
             self.canvas.delete(name)
+            return
         w,h=self.width,self.height
         signal_id=None
-        if signal and len(signal) > 1:
+        if signal.values and len(signal.values) > 1:
             print(self.units)
-            plot = [(x*w,h/2.0*(1-y/(self.units/2.0))) for (x, y) in signal]
+            plot = [(x*w,h/2.0*(1-y/(self.units/2.0))) for (x, y) in signal.values]
             signal_id=self.canvas.create_line(plot, fill=color, smooth=1, width=3,tags=name)
+            print(signal_id)
         return signal_id
 
     def grid(self,steps=2):
