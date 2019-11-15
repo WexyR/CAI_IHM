@@ -18,6 +18,8 @@ def getNoteFreq(note, octave=None, sharp=False):
     if octave is None: raise ValueError("octave can not be None")
     assert isinstance(octave, int)
 
+    connect = sqlite3.connect("Generation/frequencies.db")
+    cursor = connect.cursor()
     return cursor.execute("SELECT {0}{1} FROM frequencies WHERE octave={2};".format(note, ("", "Sharp")[int(sharp)], octave)).fetchone()[0]
 
 def loadOctave(f0, index):

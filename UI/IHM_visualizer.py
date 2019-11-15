@@ -78,13 +78,25 @@ class NoteSelector(Frame):
                 checkbox.configure(state="disabled")
             else:
                 checkbox.configure(state="normal")
+            update_selection()
 
+        current_key = StringVar()
+        keyvar = StringVar()
+        sharpvar = StringVar()
+        octave_spin = None
+        harmN_spin = None
+
+        def update_selection():
+            name = keyvar.get() + sharpvar.get() + octave_spin.get()
+            freq = getNoteFreq(name)
+            N_harm = int(harmN_spin.get())
+            s = "Selected: {0} ; N={1}".format(name, N_harm)
+            current_key.set(s)
+            self.cursig = Signal(frequency=freq, N_harm=N_harm, keyname=name)
 
         keys = tuple("ABCDEFG")
-        keyvar = StringVar()
         keyvar.set(keys[0])
-        sharpvar = StringVar()
-        is_sharp = Checkbutton(self,text="#", variable=sharpvar, onvalue='#', offvalue='')
+        is_sharp = Checkbutton(self,text="#", variable=sharpvar, onvalue='#', offvalue='',command=update_selection)
         om = OptionMenu(self, keyvar, *keys, command=lambda value=keyvar.get(), checkbox=is_sharp:sharpable(value, checkbox))
         om.grid(row=2, column=1)
         is_sharp.grid(row=2, column=2)
@@ -92,21 +104,18 @@ class NoteSelector(Frame):
         Label(self, text="Octave 2-5").grid(row=1, column=3)
 
         vcmd_spinbox = (self.register(self._validate_spinbox_octave), '%S', '%P')
-        octave = Spinbox(self, from_=2, to=5, validate="all",validatecommand=vcmd_spinbox)
-        octave.grid(row=2, column=3)
+        octave_spin = Spinbox(self, from_=2, to=5, validate="all",validatecommand=vcmd_spinbox, command=update_selection)
+        octave_spin.grid(row=2, column=3)
 
         Label(self, text="N Harmoniques").grid(row=1, column=4)
         vcmd_spinbox_harm = (self.register(self._validate_spinbox_harm), '%S', '%P')
-        harmN = Spinbox(self, from_=0, to=20, validate="all",validatecommand=vcmd_spinbox_harm)
-        harmN.grid(row=2, column=4)
+        harmN_spin = Spinbox(self, from_=0, to=20, validate="all",validatecommand=vcmd_spinbox_harm, command=update_selection)
+        harmN_spin.grid(row=2, column=4)
 
-        def submit():
-            name = keyvar.get() + sharpvar.get() + octave.get()
-            freq = getNoteFreq(name)
-            N_harm = int(harmN.get())
-            self.cursig = Signal(frequency=freq, N_harm=N_harm, keyname=name)
 
-        Button(self, text="Valider", command=submit).grid(row=2, column=5)
+        Label(self, textvariable=current_key).grid(row=2, column=5)
+        update_selection()
+        # Button(self, text="Valider", command=submit).grid(row=2, column=5)
 
     def getCurSignal(self):
         if(self.cursig):
