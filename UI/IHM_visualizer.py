@@ -5,11 +5,11 @@ from Generation.frequencies_db_init import *
 import sys
 if sys.version_info.major == 2:
     print(sys.version)
-    from Tkinter import Tk,Frame, StringVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox
+    from Tkinter import Tk, Frame, LabelFrame, StringVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox
     import tkFileDialog as filedialog
 else:
     print(sys.version)
-    from tkinter import Tk,Frame,StringVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox
+    from tkinter import Tk, Frame, LabelFrame, StringVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox
     from tkinter import filedialog
 
 class ListboxValues(Listbox):
@@ -91,8 +91,12 @@ class NoteSelector(Frame):
             freq = getNoteFreq(name)
             N_harm = int(harmN_spin.get())
             s = "Selected: {0} ; N={1}".format(name, N_harm)
+            if(freq == -1):
+                s = "frequency not found in db"
+                self.cursig = None
+            else:
+                self.cursig = Signal(frequency=freq, N_harm=N_harm, keyname=name)
             current_key.set(s)
-            self.cursig = Signal(frequency=freq, N_harm=N_harm, keyname=name)
 
         keys = tuple("ABCDEFG")
         keyvar.set(keys[0])
@@ -104,12 +108,12 @@ class NoteSelector(Frame):
         Label(self, text="Octave 2-5").grid(row=1, column=3)
 
         vcmd_spinbox = (self.register(self._validate_spinbox_octave), '%S', '%P')
-        octave_spin = Spinbox(self, from_=2, to=5, validate="all",validatecommand=vcmd_spinbox, command=update_selection)
+        octave_spin = Spinbox(self, width=10, from_=2, to=5, validate="all",validatecommand=vcmd_spinbox, command=update_selection)
         octave_spin.grid(row=2, column=3)
 
         Label(self, text="N Harmoniques").grid(row=1, column=4)
         vcmd_spinbox_harm = (self.register(self._validate_spinbox_harm), '%S', '%P')
-        harmN_spin = Spinbox(self, from_=0, to=20, validate="all",validatecommand=vcmd_spinbox_harm, command=update_selection)
+        harmN_spin = Spinbox(self, width=10, from_=0, to=20, validate="all",validatecommand=vcmd_spinbox_harm, command=update_selection)
         harmN_spin.grid(row=2, column=4)
 
 
@@ -123,54 +127,54 @@ class NoteSelector(Frame):
         return None
 
 
-class ChordSelector(Frame):
+class NoteRegisterer(LabelFrame):
     """controler which selector"""
 
-    def __init__(self, noteselector, views):
-        super().__init__()
+    def __init__(self, noteselector, views, *arg, **kwarg):
+        super().__init__(*arg, **kwarg)
         assert isinstance(views, list)
         self.noteselector = noteselector
         self.views = views
+
     def create_UI(self):
+        raise NotImplementedError
 
+    def delete_listbox_values(self, listbox, callback=None, *cbargs, **cbkwargs):
+        ind = listbox.curselection()
+        if not ind:return
+        linename, key = listbox.get(ind[0])
+        print(key.values)
+        if(callback):
+            callback(key, *cbargs, **cbkwargs)
+        listbox.delete(ind[0])
 
-        def delete_listbox_values(listbox):
-            ind = listbox.curselection()
-            if not ind:return
-            linename, key = listbox.get(ind[0])
-            key.unset_values()
-            listbox.delete(ind[0])
+    def move_listbox_value(self, from_listbox, to_listbox, callback=None, *cbargs, **cbkwargs):
+        ind = from_listbox.curselection()
+        if not ind: return
+        linename, key = from_listbox.get(ind[0])
+        if(ind):
+            to_listbox.insert(0, key)
+            from_listbox.delete(ind[0])
+            callback(key, *cbargs, **cbkwargs)
 
+class SignalsSelector(NoteRegisterer):
+    def __init__(self, *arg, **kwarg):
+        super().__init__(*arg, **kwarg)
 
-        registered_keys = ListboxValues(self)
+    def create_UI(self):
+        registered_keys = ListboxValues(self, height=5)
         registered_keys.grid(row=1, column=1)
-        registered_keys.bind("<BackSpace>", lambda event,l=registered_keys:delete_listbox_values(l))
+        registered_keys.bind("<BackSpace>", lambda event,l=registered_keys:self.delete_listbox_values(l,Signal.unset_values))
 
-        displayed_keys = ListboxValues(self)
+        displayed_keys = ListboxValues(self, height=5)
         displayed_keys.grid(row=1, column=4)
-        displayed_keys.bind("<BackSpace>", lambda event,l=displayed_keys:delete_listbox_values(l))
+        displayed_keys.bind("<BackSpace>", lambda event,l=displayed_keys:self.delete_listbox_values(l,Signal.unset_values))
 
-        def display():
-            ind = registered_keys.curselection()
-            if not ind: return
-            linename, key = registered_keys.get(ind[0])
-            if(ind):
-                displayed_keys.insert(0, key)
-                registered_keys.delete(ind[0])
-                key.generate()
 
-        Button(self, text="->", command=display).grid(row=1, column=3)
 
-        def undisplay():
-            ind = displayed_keys.curselection()
-            if not ind: return
-            linename, key = displayed_keys.get(ind[0])
-            if(ind):
-                registered_keys.insert(0, key)
-                displayed_keys.delete(ind[0])
-                key.unset_values()
+        Button(self, text="->", command=lambda:self.move_listbox_value(registered_keys, displayed_keys, Signal.generate)).grid(row=1, column=3)
 
-        Button(self, text="<-", command=undisplay).grid(row=1, column=2)
+        Button(self, text="<-", command=lambda:self.move_listbox_value(displayed_keys, registered_keys, Signal.unset_values)).grid(row=1, column=2)
 
         def AddNote():
             sig = self.noteselector.getCurSignal()

@@ -49,8 +49,9 @@ class Signal(Subject):
         return self.values
 
     def unset_values(self):
-        self.values.clear()
-        self.notify()
+        if(self.values is not None):
+            self.values.clear()
+            self.notify()
 
 class View(Observer):
     def __init__(self,parent,bg="white",width=600,height=300):
