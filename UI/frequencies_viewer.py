@@ -16,20 +16,23 @@ else:
 
 class Signal(Subject):
     """Signal class"""
-    def __init__(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, keyname="", color=None):
+    def __init__(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, duration=2, keyname="", color=None):
         Subject.__init__(self)
-        self.set(magnitude, frequency, phase, N_harm, keyname)
+        self.set(magnitude, frequency, phase, N_harm, duration, keyname, color)
 
         self.values = None
+        self.wavname = None
+        self.isplaying = False
 
     def __str__(self):
         return self.keyname + " f:" + str(int(self.frequency)) + " N:" + str(self.N_harm)
 
-    def set(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, keyname="", color=None):
+    def set(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, duration=2, keyname="", color=None):
         self.magnitude = magnitude
         self.frequency = frequency
         self.phase = phase
         self.N_harm = N_harm
+        self.duration = duration
         self.keyname = keyname
 
         if color is None:
@@ -52,6 +55,16 @@ class Signal(Subject):
         if(self.values is not None):
             self.values.clear()
             self.notify()
+
+    def generate_sound(self):
+        self.wavname = "wavname" # TODO: add info: freq, N_harm, duration...
+        # TODO: create wav here
+
+    def play(self):
+        if self.wavename is not None:
+            self.isplaying = True
+            self.notify()
+            self.isplaying = False
 
 class View(Observer):
     def __init__(self,parent,bg="white",width=600,height=300):
