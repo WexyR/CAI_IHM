@@ -1,10 +1,11 @@
 import sys
 
-from tkinter import Tk,Frame,Button,Label,LabelFrame,Menu,Toplevel,messagebox
-from tkinter.ttk import Notebook
+from tkinter import Tk,Button,Label,Menu,Toplevel,messagebox
+from tkinter.ttk import Notebook,Frame,LabelFrame
 from tkinter import filedialog
 
-from UI.piano_mvc import Piano
+from UI.piano_mvc import *
+from UI.IHM_visualizer import *
 
 class MainUI (Tk):
     """This is the main UI class. It is responsible for the module linking."""
@@ -16,7 +17,10 @@ class MainUI (Tk):
     def __init__(self):
         Tk.__init__(self)
 
-        self.geometry("600x350")
+        w = self.winfo_screenwidth()
+        h = self.winfo_screenheight()
+
+        self.geometry("1000x620+"+str(int(w/2.0-750))+"+"+str(int(h/2.0-310)))
         self.title("La leçon de piano - Beta Version - Do not distribute")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
@@ -31,6 +35,22 @@ class MainUI (Tk):
         subframe_menu.pack(fill="both", expand="yes")
 
         ######################################################################
+        #                         Fenêtre Affichage
+        ######################################################################
+
+        def on_plotter_frame_closing():
+            self.plotter_frame.withdraw()
+
+        self.plotter_frame = Toplevel(self)
+        self.plotter_frame.geometry("500x310+"+str(int(w/2.0+250))+"+"+str(int(h/2.0-310)))
+        self.plotter_frame.title("Affichage des notes");
+        self.plotter_frame.protocol("WM_DELETE_WINDOW", on_plotter_frame_closing)
+        self.plotter=View(self.plotter_frame)
+        self.plotter.grid(4)
+        self.plotter.packing()
+        #label3 = Label(self.plotter_frame, text="Affichage ici").pack()
+
+        ######################################################################
         #                         Mode Generation
         ######################################################################
 
@@ -38,17 +58,29 @@ class MainUI (Tk):
         frame0.pack()
         subframe_menu.add(frame0, text="Génération")
 
-        frame1 = LabelFrame(frame0, text="Génération de la note", padx=20, pady=20);
-        frame1.pack(fill="both", side="left", expand="yes")
+        IHM = NoteSelector(frame0)
+        IHM.create_UI()
+        IHM.pack()
 
-        label1 = Label(frame1, text="Générer note ici").pack()
+        ######### Left: notes
+        #frame1 = Frame(frame0, padx=20, pady=20);
+        #frame1.pack(fill="both", side="left", expand="yes")
+        #label1 = Label(frame1, text="Générer note ici").pack()
 
-        ###########
+        ss = SignalsSelector(IHM, [self.plotter], text="SignalSelector", padx=20, pady=20)
+        ss.create_UI()
+        ss.pack(fill="both", side="left", expand="yes")
 
-        frame2 = LabelFrame(frame0, text="Génération des accords", padx=20, pady=20);
-        frame2.pack(fill="both", side="right", expand="yes")
+        ######### Right: accords
+        #frame2 = LabelFrame(frame0, text="Génération des accords", padx=20, pady=20);
+        #frame2.pack(fill="both", side="right", expand="yes")
+        #label2 = Label(frame2, text="Générer accords ici").pack()
 
-        label2 = Label(frame2, text="Générer accords ici").pack()
+        chordsel = ChordSelector(IHM, [], text="ChordSelector", padx=20, pady=20)
+        chordsel.create_UI()
+        chordsel.pack(fill="both", side="right", expand="yes")
+
+
 
 
         ######################################################################
@@ -64,44 +96,46 @@ class MainUI (Tk):
         piano.packing()
 
         ######################################################################
-        #                         Fenêtre Affichage
-        ######################################################################
-
-        self.plotter_frame = Toplevel(self)
-        self.plotter_frame.geometry("400x200")
-        #self.plotter_frame.withdraw()
-        self.plotter_frame.title("Affichage des notes");
-
-        def on_plotter_frame_closing():
-            self.plotter_frame.withdraw()
-
-        self.plotter_frame.protocol("WM_DELETE_WINDOW", on_plotter_frame_closing)
-
-        label3 = Label(self.plotter_frame, text="Affichage ici").pack()
-
-        ######################################################################
         #                          Menubar linking
         ######################################################################
 
         file_menu = Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Quitter")
+        file_menu.add_command(label="Quitter", command=self.on_closing)
         menu_bar.add_cascade(label="Fichier", menu=file_menu)
 
+        ###################
         edition_menu = Menu(menu_bar, tearoff=0)
+        def reset_data():
+            # TODO: find a way to detect files using sys
+            pass
         edition_menu.add_command(label="Regenérer Tout")
+        def reset_data():
+            # remove all from the signal storing models
+            pass
         edition_menu.add_command(label="Rétablir Défaut")
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
 
+        #############
         window_menu = Menu(menu_bar, tearoff=0)
         window_submenu1 = Menu(window_menu, tearoff=0)
+        ###################
         window_submenu1.add_command(label="Afficheur Onde", command=self.plotter_frame.deiconify)
         window_submenu1.add_command(label="Afficheur Harmonique")
+        ###################
         window_menu.add_cascade(label="Ouvrir Vue", menu=window_submenu1)
+        #############
+        def open_all():
+            self.plotter_frame.deiconify()
         window_menu.add_command(label="Ouvrir Tout")
         window_menu.add_separator()
-        window_menu.add_command(label="Rétablir défaut")
-        menu_bar.add_cascade(label="Fenêtre", menu=window_menu)
+        #############
+        def reset_view():
+            self.geometry("1000x620+"+str(int(w/2.0-750))+"+"+str(int(h/2.0-310)))
+            self.plotter_frame.geometry("500x310+"+str(int(w/2.0+250))+"+"+str(int(h/2.0-310)))
+        window_menu.add_command(label="Rétablir défaut", command=reset_view)
+        ##################
 
+        menu_bar.add_cascade(label="Fenêtre", menu=window_menu)
         help_menu = Menu(menu_bar, tearoff=0)
         help_menu.add_command(label="Support")
         help_menu.add_command(label="Crédits")
