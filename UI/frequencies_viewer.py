@@ -3,33 +3,39 @@ from random import choice
 from observer import *
 ## from pylab import linspace,sin
 
-import sys
+import sys, os
 if sys.version_info.major == 2:
     print(sys.version)
-    from Tkinter import Tk,Canvas
+    from Tkinter import Tk,Canvas, messagebox
     import tkFileDialog as filedialog
 else:
     print(sys.version)
-    from tkinter import Tk,Canvas
+    from tkinter import Tk,Canvas, messagebox
     from tkinter import filedialog
 
 
 class Signal(Subject):
     """Signal class"""
-    def __init__(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, keyname="", color=None):
+    def __init__(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, duration=2, keyname="", color=None):
         Subject.__init__(self)
-        self.set(magnitude, frequency, phase, N_harm, keyname)
+        self.set(magnitude, frequency, phase, N_harm, duration, keyname, color)
 
         self.values = None
+        self.wavname = None
+        self.isplaying = False
 
     def __str__(self):
-        return self.keyname + " f:" + str(int(self.frequency)) + " N:" + str(self.N_harm)
+        if self.wavname is None:
+            return self.keyname + " f:" + str(int(self.frequency)) + " N:" + str(self.N_harm)
+        else:
+            return self.wavname
 
-    def set(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, keyname="", color=None):
+    def set(self, magnitude=1.0, frequency=1.0, phase=0.0, N_harm=0, duration=2, keyname="", color=None):
         self.magnitude = magnitude
         self.frequency = frequency
         self.phase = phase
         self.N_harm = N_harm
+        self.duration = duration
         self.keyname = keyname
 
         if color is None:
@@ -49,8 +55,41 @@ class Signal(Subject):
         return self.values
 
     def unset_values(self):
-        self.values.clear()
-        self.notify()
+        if(self.values is not None):
+            self.values.clear()
+            self.notify()
+
+    def generate_sound(self, force=False):
+        wavname = self.get_wavname_by_data()
+
+        existing_file = os.path.exists(wavname)
+
+        # existing_file = True #test debug
+        # sucess = True        #test debug
+
+        if(not force and existing_file):
+            return 1 #already generated file
+
+        # TODO: create .wav here
+
+        if(sucess):
+            self.wavname = wavname
+            return 0 #sucess
+        else:
+            return -1 #error
+
+    def play(self):
+        if self.wavname is not None:
+            self.isplaying = True
+            self.notify()
+            self.isplaying = False
+            return 0
+        else:
+            return -1
+
+    def get_wavname_by_data(self):
+        return "{0}_{1:.2f}_{2}_{3}s.wav".format(self.keyname, self.frequency, self.N_harm, self.duration)
+
 
 class View(Observer):
     def __init__(self,parent,bg="white",width=600,height=300):
