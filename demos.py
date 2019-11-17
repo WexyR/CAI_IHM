@@ -36,5 +36,5 @@ if __name__ == "__main__":
         chordsel.create_UI()
         chordsel.pack()
         view.grid(4)
-        view.pack()
+        view.packing()
         mw.mainloop()
