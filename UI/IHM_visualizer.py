@@ -5,14 +5,15 @@ from Generation.frequencies_db_init import *
 import sys
 if sys.version_info.major == 2:
     print(sys.version)
-    from Tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry
+    from Tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
     import tkFileDialog as filedialog
 else:
     print(sys.version)
-    from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry
+    from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
     from tkinter import filedialog
 
 class ListboxValues(Listbox):
+    """Listbox widget but also save variables in a list (not just the __str__ value)"""
     def __init__(self, *arg, **kwargs):
         super().__init__(*arg, **kwargs)
         self.values = []
@@ -143,13 +144,13 @@ class NoteSelector(LabelFrame):
 
         def update_form_disable():
             if(note_or_freq.get()):
-                frequency_scale.configure(state="normal", sliderrelief="raised", troughcolor="#ABABAB")
+                frequency_scale.configure(state="normal", sliderrelief="raised", troughcolor="#ABABAB", showvalue=1)
                 frequency_entry.configure(state="normal")
                 om.configure(state="disabled")
                 is_sharp.configure(state="disabled")
                 octave_spin.configure(state="disabled")
             else:
-                frequency_scale.configure(state="disabled", sliderrelief="flat", troughcolor="#555555")
+                frequency_scale.configure(state="disabled", sliderrelief="flat", troughcolor="#555555", showvalue=0)
                 frequency_entry.configure(state="disabled")
                 om.configure(state="normal")
                 is_sharp.configure(state="normal")
@@ -204,12 +205,19 @@ class NoteRegisterer(LabelFrame):
         self.button_toleft = None
         self.button_toright = None
         self.add_button = None
+        self.left_listbox_label = None
+        self.right_listbox_label = None
 
     def create_UI(self):
+
+        self.left_listbox_label = Label(self, text="left_listbox")
+        self.left_listbox_label.grid(row=1, column=1)
         self.left_listbox = ListboxValues(self, height=5)
         self.left_listbox.grid(row=2, column=1)
         self.left_listbox.bind("<BackSpace>", lambda event,l=self.left_listbox:self.delete_listbox_values(l,Signal.unset_values))
 
+        self.right_listbox_label = Label(self, text="right_listbox")
+        self.right_listbox_label.grid(row=1, column=4)
         self.right_listbox = ListboxValues(self, height=5)
         self.right_listbox.grid(row=2, column=4)
         self.right_listbox.bind("<BackSpace>", lambda event,l=self.right_listbox:self.delete_listbox_values(l,Signal.unset_values))
@@ -242,15 +250,17 @@ class NoteRegisterer(LabelFrame):
         if(callback):
             callback(key, *cbargs, **cbkwargs)
 
-    def add_note(self, validatecallback=None, *cbargs, **cbkwargs):
+    def add_note(self, listbox=None, validatecallback=None, *cbargs, **cbkwargs):
+        if listbox is None: listbox=self.left_listbox;
         sig = self.noteselector.getCurSignal()
         if not sig: return -1
         if validatecallback is not None:
             if not validatecallback(sig, *cbargs, **cbkwargs):
                 return -2
+
         for v in self.views:
             sig.attach(v)
-        self.left_listbox.insert(0, sig)
+        listbox.insert(0, sig)
 
 class SignalsSelector(NoteRegisterer):
     def __init__(self, *arg, **kwarg):
@@ -258,6 +268,8 @@ class SignalsSelector(NoteRegisterer):
 
     def create_UI(self):
         super().create_UI()
+        self.left_listbox_label.configure(text="signals")
+        self.right_listbox_label.configure(text="displayed signals")
 
         self.button_toright.configure(command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate))
         self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
@@ -266,8 +278,28 @@ class ChordSelector(NoteRegisterer):
     def __init__(self, *arg, **kwarg):
         super().__init__(*arg, **kwarg)
 
+    def generate_signal_wav(self, sig, force_generation):
+        generation_status = sig.generate_sound(force=force_generation)
+        if(generation_status == 0): #if succesfully generated
+            messagebox.showinfo("wav generated", "{0} file has succesfully been generated".format(sig.wavname))
+        elif generation_status == -1:
+            messagebox.showerror("Generation Error", "Error while generating wav file. Aborting...")
+            return -1
+        elif generation_status == 1:
+            is_yes = messagebox.askyesno("Already existing file","Already existing file, do you want to overwrite it ?")
+            if is_yes:
+                return self.generate_signal_wav(sig, True)
+
+    def play_signal_sound(self, sig):
+        if(sig.play() == -1):
+            messagebox.showwarning("Play", "No file has been found for this note")
+
     def create_UI(self):
+
+        ### super() modifications
         super().create_UI()
+        self.left_listbox_label.configure(text="notes")
+        self.right_listbox_label.configure(text="chord")
         self.right_listbox.configure(height=3)
 
         def select_chord_cb():
@@ -280,8 +312,42 @@ class ChordSelector(NoteRegisterer):
 
         def validatecallback(sig):
             if sig.keyname is None or sig.keyname == "":
+                messagebox.showerror("Error", "Only note (not frequency) signal can be selected")
                 return False
             else:
                 return True
 
-        self.add_button.configure(command=lambda:self.add_note(validatecallback))
+
+        def generate_and_add():
+            sig = self.noteselector.getCurSignal()
+            generation = self.generate_signal_wav(sig, False)
+            if(generation == -1):
+                messagebox.showwarning("This sound has not been generated. Listening to this sound will be impossible. Try to generate it again")
+            self.add_note(validatecallback=validatecallback)
+
+
+
+        self.add_button.configure(command=generate_and_add)
+
+        ### self additions
+
+        self.generate_button = Button(self, text="generate chord.wav")
+        self.generate_button.grid(row=3, column=4)
+
+        def play_cursig():
+            ind = self.left_listbox.curselection()
+            if not ind:
+                messagebox.showerror("Error", "No note selected")
+                return
+            linename, sig = self.left_listbox.get(ind[0])
+            if(sig):
+                self.play_signal_sound(sig)
+            else:
+                messagebox.showerror("Error", "No signal found")
+
+
+        self.play_button = Button(self, text="Play sound", command=play_cursig)
+        self.play_button.grid(row=4, column=1)
+
+        self.playchord_button = Button(self, text="Play chord")
+        self.playchord_button.grid(row=4, column=4)
