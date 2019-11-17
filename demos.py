@@ -20,8 +20,6 @@ if __name__ == "__main__":
         s2.attach(view)
         view.grid(4)
         view.packing()
-        s1.generate()
-        s2.generate()
         root.mainloop()
     elif(arg == '2'):
         from UI.IHM_visualizer import *
@@ -31,9 +29,9 @@ if __name__ == "__main__":
         IHM = NoteSelector(mw)
         IHM.create_UI()
         IHM.pack()
-        sss = SignalsSelector(IHM, [view], text="SignalsSelector")
-        sss.create_UI()
-        sss.pack()
+        ss = SignalsSelector(IHM, [view], text="SignalSelector")
+        ss.create_UI()
+        ss.pack()
         chordsel = ChordSelector(IHM, [], text="ChordSelector")
         chordsel.create_UI()
         chordsel.pack()
