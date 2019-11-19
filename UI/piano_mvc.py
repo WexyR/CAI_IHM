@@ -113,7 +113,7 @@ class Piano :
         control.get_keyboard().pack()
         frame.pack(side="left",fill="x",expand=True)
     def packing(self) :
-        self.frame.pack()
+        self.frame.pack(fill="both", side="right", expand="yes")
 
 
 if __name__ == "__main__" :
