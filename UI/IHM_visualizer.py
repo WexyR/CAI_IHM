@@ -261,6 +261,15 @@ class NoteRegisterer(LabelFrame):
         for v in self.views:
             sig.attach(v)
         listbox.insert(0, sig)
+    def empty(self, side="both"):
+        assert isinstance(side, str)
+        side = side.lower()
+        assert side in ("left", "right", "both")
+
+        if side in ("left", "both"):
+            self.left_listbox.delete(0, self.left_listbox.size())
+        if side in ("right", "both"):
+            self.right_listbox.delete(0, self.right_listbox.size())
 
 class SignalsSelector(NoteRegisterer):
     def __init__(self, *arg, **kwarg):
