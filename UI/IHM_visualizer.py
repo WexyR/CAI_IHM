@@ -34,12 +34,14 @@ class ListboxValues(Listbox):
     def delete(self, start, end=None):
         if not isinstance(start, int): raise TypeError("start must be integer")
         if not isinstance(end, int) and end is not None: raise TypeError("end must be integer or None")
-        super().delete(start, end)
+
         if end is not None:
-            for i in range(start, end):
-                del self.values[i]
+            for i in range(start, end+1):
+                del self.values[start]
         else:
             del self.values[start]
+
+        super().delete(start, end)
 
 
 
@@ -267,15 +269,46 @@ class NoteRegisterer(LabelFrame):
         assert side in ("left", "right", "both")
 
         if side in ("left", "both"):
+            self.left_listbox.delete(0, self.left_listbox.size()-1)
+        if side in ("right", "both"):
+            self.right_listbox.delete(0, self.right_listbox.size()-1)
+
+    def execute_on_elements(self, start, end=None, side="both", callback=None, *args, **kwargs):
+        """execute a callback function on some elements of the listboxes
+        start: start index of elements
+        end: end index of elements
+          --- None : only the element at start will be concerned
+          --- -1   : all elements will be concerned
+        side: listbox concerned
+          --- "both"
+          --- "left"
+          --- "right"
+        callback: function to execute on elements with every other parameters given
+                  callback(element, *cbargs, **cbkwargs)"""
+        assert isinstance(side, str)
+        side = side.lower()
+        assert side in ("left", "right", "both")
+
+        if side in ("left", "both"):
             if callback is not None:
-                for _, element in self.left_listbox.get(0, self.left_listbox.size()):
-                    callback(element, *args, **kwargs)
-            self.left_listbox.delete(0, self.left_listbox.size())
+                if end == -1:
+                    end = self.left_listbox.size()-1
+                elif end is None:
+                    callback(self.left_listbox.get(start)[1], *args, **kwargs)
+                else:
+                    elements = self.left_listbox.get(start, end)
+                    for _, element in elements:
+                        callback(element, *args, **kwargs)
         if side in ("right", "both"):
             if callback is not None:
-                for _, element in self.right_listbox.get(0, self.right_listbox.size()):
-                    callback(element, *args, **kwargs)
-            self.right_listbox.delete(0, self.right_listbox.size())
+                if end == -1:
+                    end = self.right_listbox.size()-1
+                elif end is None:
+                    callback(self.right_listbox.get(start)[1], *args, **kwargs)
+                else:
+                    elements = self.right_listbox.get(start, end)
+                    for _, element in elements:
+                        callback(element, *args, **kwargs)
 
 class SignalsSelector(NoteRegisterer):
     def __init__(self, *arg, **kwarg):

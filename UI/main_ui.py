@@ -22,6 +22,7 @@ class MainUI (Tk):
         w = self.winfo_screenwidth()
         h = self.winfo_screenheight()
 
+        self.resizable(False, False)
         self.geometry("1000x620+"+str(int(w/2.0-750))+"+"+str(int(h/2.0-310)))
         self.title("La leçon de piano - Beta Version - Do not distribute")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -93,8 +94,8 @@ class MainUI (Tk):
         frame4.pack()
         subframe_menu.add(frame4, text="Clavier")
 
-        octaves = 2
-        piano = Piano(frame4, octaves)
+        octaves = 3
+        piano = Piano(frame4, octaves, 45, 210)
         piano.packing()
 
         ######################################################################
@@ -120,7 +121,9 @@ class MainUI (Tk):
                 except Exception as e:
                     print(e)
             regen_data()
+            ss.execute_on_elements(0, -1, callback=Signal.unset_values)
             ss.empty()
+            chordsel.execute_on_elements(0, -1, callback=Signal.reset_wavname)
             chordsel.empty()
         edition_menu.add_command(label="Rétablir Défaut", command=reset_data)
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
