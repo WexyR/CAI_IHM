@@ -267,8 +267,14 @@ class NoteRegisterer(LabelFrame):
         assert side in ("left", "right", "both")
 
         if side in ("left", "both"):
+            if callback is not None:
+                for _, element in self.left_listbox.get(0, self.left_listbox.size()):
+                    callback(element, *args, **kwargs)
             self.left_listbox.delete(0, self.left_listbox.size())
         if side in ("right", "both"):
+            if callback is not None:
+                for _, element in self.right_listbox.get(0, self.right_listbox.size()):
+                    callback(element, *args, **kwargs)
             self.right_listbox.delete(0, self.right_listbox.size())
 
 class SignalsSelector(NoteRegisterer):
