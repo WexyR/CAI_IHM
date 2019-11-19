@@ -120,7 +120,9 @@ class MainUI (Tk):
                 except Exception as e:
                     print(e)
             regen_data()
+            ss.execute_on_elements(0, -1, callback=Signal.unset_values)
             ss.empty()
+            chordsel.execute_on_elements(0, -1, callback=Signal.reset_wavname)
             chordsel.empty()
         edition_menu.add_command(label="Rétablir Défaut", command=reset_data)
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
