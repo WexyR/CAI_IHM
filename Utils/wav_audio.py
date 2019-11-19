@@ -67,7 +67,8 @@ def save_wav(filename,data,framerate):
         # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
         if data[i]<-32767 : data[i]=-32767
         elif data[i]>32767: data[i]=32767
-        file.writeframes(wave.struct.pack('h',data[i])) # codage et écriture échantillon 16 bits signés
+    data_str = b''.join(data)
+    sound.writeframes(data_str)  # codage et écriture échantillon 16 bits signés
     print("saving WAV file : '"+filename+"' done !")
     file.close()
 

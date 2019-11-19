@@ -3,6 +3,7 @@
 #http://fsincere.free.fr/isn/python/cours_python_ch9.php
 #http://izeunetit.fr/ICN1ere/son_audio.php
 # (C) Fabrice Sincère ; Jean-Claude Meilland
+
 import wave
 import math
 import os
@@ -23,7 +24,7 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
     nb_bytes = 1       # taille d'un échantillon : 1 octet = 8 bits
     sampling = 44100   # fréquence d'échantillonnage
     left_level = 1     # niveau canal de gauche (0 à 1) ? '))
-    right_level= 0.5    # niveau canal de droite (0 à 1) ? '))
+    right_level= 1    # niveau canal de droite (0 à 1) ? '))
     duration = 1
     nb_samples = int(duration*sampling)
     params = (nb_channels,nb_bytes,sampling,nb_samples,'NONE','not compressed')
@@ -46,21 +47,23 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
         # canal droit
         right_value = wave.struct.pack('B',int(128.0 + k*right_magnitude*math.sin(2.0*math.pi*right_frequency*i/sampling)))
         values.append(left_value)
-        values.append(right_value) # écriture frame
+        values.append(right_value)
     value_str = b''.join(values)
+    mutex.acquire() # By doing that we ensure there is only one thread writing at a time. It should improve performance.
     sound.writeframes(value_str)
+    mutex.release()
     sound.close()
 
+mutex = threading.Lock()
 connect = sqlite3.connect("Generation/frequencies.db")
 cursor = connect.cursor()
 gammes=cursor.execute("SELECT * FROM frequencies").fetchall()
 notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-n_note = cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()[0]*len(notes)
+n_note = cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()[0]*(len(notes)-1)
 j=0
 threads = []
 
 print("Generating wav files from frequencies db...")
-
 for gamme in gammes :
     for i in range(1,len(gamme)) :
         j+=1
@@ -68,7 +71,6 @@ for gamme in gammes :
             print("Generating {0}/{1} (Sounds/{2}.wav)".format(j, n_note, notes[i]+str(gamme[0])))
             threads.append(threading.Thread(target=create_note_wav, args=(gamme[0],notes[i],gamme[i],2*gamme[i])))
             threads[-1].start()
-            #create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
 for thread in threads :
     thread.join()
 print("Done loading {0} sounds!".format(n_note))
