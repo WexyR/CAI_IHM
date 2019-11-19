@@ -87,6 +87,11 @@ def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):
     save_wav(file,data,framerate)
     return data
 
+def wav_chord(file ='chord.wav',frequencies=[],framerate=8000,duration=2):
+    data =[sum([0]+[int(30000*math.cos(2*math.pi*f*i/framerate)) for i in frequencies]) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
+    save_wav(file,data,framerate)
+    return data
+
 if  __name__ == "__main__" :
     wav_sinus('A2.wav',220,8000,1)
     wav_sinus('A3.wav',440,8000,1)
