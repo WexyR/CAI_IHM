@@ -16,6 +16,7 @@ import Generation.frequencies_db_init
 ## Son de forme sinusoïdale sur chaque canal
 
 def create_note_wav(degree,name,left_frequency,right_frequency) :
+    global ioMutex
     if type(degree) != str :
         degree=str(degree)
     file= "Sounds/"+name+degree+".wav"
@@ -49,28 +50,30 @@ def create_note_wav(degree,name,left_frequency,right_frequency) :
         values.append(left_value)
         values.append(right_value)
     value_str = b''.join(values)
-    mutex.acquire() # By doing that we ensure there is only one thread writing at a time. It should improve performance.
+    ioMutex.acquire() # By doing that we ensure there is only one thread writing at a time. It should improve performance.
     sound.writeframes(value_str)
-    mutex.release()
+    ioMutex.release()
     sound.close()
 
-mutex = threading.Lock()
-connect = sqlite3.connect("Generation/frequencies.db")
-cursor = connect.cursor()
-gammes=cursor.execute("SELECT * FROM frequencies").fetchall()
-notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-n_note = cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()[0]*(len(notes)-1)
-j=0
-threads = []
+def generate():
+    connect = sqlite3.connect("Generation/frequencies.db")
+    cursor = connect.cursor()
+    gammes=cursor.execute("SELECT * FROM frequencies").fetchall()
+    notes=["octave","C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
+    n_note = cursor.execute("SELECT COUNT(*) FROM frequencies").fetchone()[0]*(len(notes)-1)
+    j=0
+    threads = []
+    print("Generating wav files from frequencies db...")
+    for gamme in gammes :
+        for i in range(1,len(gamme)) :
+            j+=1
+            if not os.path.exists("Sounds/"+notes[i]+str(gamme[0])+".wav"):
+                print("Generating {0}/{1} (Sounds/{2}.wav)".format(j, n_note, notes[i]+str(gamme[0])))
+                threads.append(threading.Thread(target=create_note_wav, args=(gamme[0],notes[i],gamme[i],2*gamme[i])))
+                threads[-1].start()
+    for thread in threads :
+        thread.join()
+    print("Done loading {0} sounds!".format(n_note))
 
-print("Generating wav files from frequencies db...")
-for gamme in gammes :
-    for i in range(1,len(gamme)) :
-        j+=1
-        if not os.path.exists("Sounds/"+notes[i]+str(gamme[0])+".wav"):
-            print("Generating {0}/{1} (Sounds/{2}.wav)".format(j, n_note, notes[i]+str(gamme[0])))
-            threads.append(threading.Thread(target=create_note_wav, args=(gamme[0],notes[i],gamme[i],2*gamme[i])))
-            threads[-1].start()
-for thread in threads :
-    thread.join()
-print("Done loading {0} sounds!".format(n_note))
+ioMutex = threading.Lock()
+generate()

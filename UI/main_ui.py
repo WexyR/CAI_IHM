@@ -1,4 +1,5 @@
 import sys
+import subprocess
 
 from tkinter import Tk,Button,Label,Menu,Toplevel,messagebox
 from tkinter.ttk import Notebook,Frame,LabelFrame
@@ -6,6 +7,7 @@ from tkinter import filedialog
 
 from UI.piano_mvc import *
 from UI.IHM_visualizer import *
+import Utils.wav_create_notes_from_frequencies_db
 
 class MainUI (Tk):
     """This is the main UI class. It is responsible for the module linking."""
@@ -60,7 +62,7 @@ class MainUI (Tk):
 
         IHM = NoteSelector(frame0)
         IHM.create_UI()
-        IHM.pack()
+        IHM.pack(fill="both", side="left", expand="yes")
 
         ######### Left: notes
         #frame1 = Frame(frame0, padx=20, pady=20);
@@ -105,14 +107,22 @@ class MainUI (Tk):
 
         ###################
         edition_menu = Menu(menu_bar, tearoff=0)
+        def regen_data():
+            Utils.wav_create_notes_from_frequencies_db.generate()
+        edition_menu.add_command(label="Recharger Tout", command=regen_data)
         def reset_data():
-            # TODO: find a way to detect files using sys
-            pass
-        edition_menu.add_command(label="Regenérer Tout")
-        def reset_data():
-            # remove all from the signal storing models
-            pass
-        edition_menu.add_command(label="Rétablir Défaut")
+            folder = os.path.realpath(os.curdir)+"/Sounds"
+            for f in os.listdir(folder):
+                file_path = os.path.join(folder, f)
+                try:
+                    if file_path.endswith(".wav",) and os.path.isfile(file_path):
+                        os.unlink(file_path)
+                except Exception as e:
+                    print(e)
+            regen_data()
+            ss.empty()
+            chordsel.empty()
+        edition_menu.add_command(label="Rétablir Défaut", command=reset_data)
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
 
         #############
@@ -120,13 +130,13 @@ class MainUI (Tk):
         window_submenu1 = Menu(window_menu, tearoff=0)
         ###################
         window_submenu1.add_command(label="Afficheur Onde", command=self.plotter_frame.deiconify)
-        window_submenu1.add_command(label="Afficheur Harmonique")
+        window_submenu1.add_command(label="Afficheur Harmonique", state="disabled")
         ###################
         window_menu.add_cascade(label="Ouvrir Vue", menu=window_submenu1)
         #############
         def open_all():
             self.plotter_frame.deiconify()
-        window_menu.add_command(label="Ouvrir Tout")
+        window_menu.add_command(label="Ouvrir Tout", command=open_all)
         window_menu.add_separator()
         #############
         def reset_view():
