@@ -60,7 +60,7 @@ if not os.path.exists("Generation/frequencies.db"):
     );")
 
     print("Generating octave tables...")
-    n_octave = 4
-    for i in range(0,n_octave):
+    n_octave = (2,5)
+    for i in range(n_octave[0], n_octave[1]):
         loadOctave(440.0*2**(i-3), i)
     print("Done generating tables!")

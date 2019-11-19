@@ -61,12 +61,11 @@ class Screen(Observer):
             self.info.config(text = "Vous avez joué la note : " + key + str(model.get_degree()))
 
 class Keyboard :
-    def __init__(self,parent,model) :
+    def __init__(self,parent,model, key_w=50, key_h=220) :
         self.parent=parent
         self.model=model
-        self.create_keyboard()
-    def create_keyboard(self) :
-        key_w,key_h=40,150
+        self.create_keyboard(key_w, key_h)
+    def create_keyboard(self, key_w=50, key_h=220) :
         dx_white,dx_black=0,0
         self.keyboard=Frame(self.parent,borderwidth=5,width=7*key_w,height=key_h,bg="red")
         for key in self.model.gamme.keys() :
@@ -96,17 +95,17 @@ class Keyboard :
         return self.degrees
 
 class Piano :
-    def __init__(self,parent,octaves) :
+    def __init__(self,parent,octaves, key_w=50, key_h=220) :
         self.parent=parent
         self.octaves=[]
         self.frame=Frame(self.parent,bg="yellow")
         for octave in range(octaves) :
-            self.create_octave(self.frame,octave+2)
-    def create_octave(self,parent,degree=3) :
+            self.create_octave(self.frame,octave+2, key_w=key_w, key_h=key_h)
+    def create_octave(self,parent,degree=3, key_w=50, key_h=220) :
         frame=Frame(parent,bg="green")
         model=Octave(degree)
         self.octaves.append(model)
-        control=Keyboard(frame,model)
+        control=Keyboard(frame,model, key_w=key_w, key_h=key_h)
         view=Screen(frame)
         model.attach(view)
         view.get_screen().pack()
