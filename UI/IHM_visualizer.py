@@ -2,6 +2,7 @@ from UI.frequencies_viewer import View, Signal
 from observer import Subject, Observer
 from Generation.frequencies_db_init import *
 
+
 import sys
 if sys.version_info.major == 2:
     print(sys.version)
@@ -291,21 +292,23 @@ class NoteRegisterer(LabelFrame):
 
         if side in ("left", "both"):
             if callback is not None:
-                if end == -1:
-                    end = self.left_listbox.size()-1
-                elif end is None:
+
+                if end is None:
                     callback(self.left_listbox.get(start)[1], *args, **kwargs)
                 else:
+                    if end == -1:
+                        end = self.left_listbox.size()-1
                     elements = self.left_listbox.get(start, end)
+                    print(elements)
                     for _, element in elements:
                         callback(element, *args, **kwargs)
         if side in ("right", "both"):
             if callback is not None:
-                if end == -1:
-                    end = self.right_listbox.size()-1
-                elif end is None:
+                if end is None:
                     callback(self.right_listbox.get(start)[1], *args, **kwargs)
                 else:
+                    if end == -1:
+                        end = self.right_listbox.size()-1
                     elements = self.right_listbox.get(start, end)
                     for _, element in elements:
                         callback(element, *args, **kwargs)
@@ -332,6 +335,7 @@ class ChordSelector(NoteRegisterer):
             messagebox.showinfo("wav generated", "{0} file has succesfully been generated".format(sig.wavname))
         elif generation_status == -1:
             messagebox.showerror("Generation Error", "Error while generating wav file. Aborting...")
+            
             return -1
         elif generation_status == 1:
             is_yes = messagebox.askyesno("Already existing file","Already existing file, do you want to overwrite it ?")
