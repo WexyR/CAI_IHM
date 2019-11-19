@@ -291,21 +291,23 @@ class NoteRegisterer(LabelFrame):
 
         if side in ("left", "both"):
             if callback is not None:
-                if end == -1:
-                    end = self.left_listbox.size()-1
-                elif end is None:
+
+                if end is None:
                     callback(self.left_listbox.get(start)[1], *args, **kwargs)
                 else:
+                    if end == -1:
+                        end = self.left_listbox.size()-1
                     elements = self.left_listbox.get(start, end)
+                    print(elements)
                     for _, element in elements:
                         callback(element, *args, **kwargs)
         if side in ("right", "both"):
             if callback is not None:
-                if end == -1:
-                    end = self.right_listbox.size()-1
-                elif end is None:
+                if end is None:
                     callback(self.right_listbox.get(start)[1], *args, **kwargs)
                 else:
+                    if end == -1:
+                        end = self.right_listbox.size()-1
                     elements = self.right_listbox.get(start, end)
                     for _, element in elements:
                         callback(element, *args, **kwargs)
