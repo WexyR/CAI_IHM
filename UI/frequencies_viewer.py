@@ -1,6 +1,7 @@
 from math import sin,pi
 from random import choice
 from observer import *
+from Utils.wav_audio import save_wav
 ## from pylab import linspace,sin
 
 import sys, os
@@ -62,17 +63,26 @@ class Signal(Subject):
     def generate_sound(self, force=False):
         wavname = self.get_wavname_by_data()
 
-        existing_file = os.path.exists(wavname)
+        existing_file = os.path.exists("Sounds/"+wavname)
 
-        # existing_file = True #test debug
-        # sucess = True        #test debug
+        print(existing_file)
 
         if(not force and existing_file):
+            self.wavname = wavname
             return 1 #already generated file
 
-        # TODO: create .wav here
+        try:
+            framerate = 8000
+            wav_values = [30000 * self.harmonize(t/framerate, self.N_harm) for t in range(int(framerate*self.duration))]
+            save_wav(wavname, wav_values, framerate)
 
-        if(sucess):
+
+            success = True
+        except Exception as e:
+            print(e)
+            success = False
+
+        if(success):
             self.wavname = wavname
             return 0 #sucess
         else:
@@ -86,6 +96,7 @@ class Signal(Subject):
             return 0
         else:
             return -1
+
 
     def get_wavname_by_data(self):
         return "{0}_{1:.2f}_{2}_{3}s.wav".format(self.keyname, self.frequency, self.N_harm, self.duration)

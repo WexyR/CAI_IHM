@@ -14,10 +14,8 @@ import Generation.frequencies_db_init
 ## Création d'un fichier audio au format WAV (PCM 8 bits stéréo 44100 Hz)
 ## Son de forme sinusoïdale sur chaque canal
 
-def create_note_wav(degree,name,left_frequency,right_frequency) :
-    if type(degree) != str :
-        degree=str(degree)
-    file= "Sounds/"+name+degree+".wav"
+def create_note_wav(wavname,left_frequency,right_frequency) :
+    file= "Sounds/"+wavname+".wav"
     sound=wave.open(file,'w')
     nb_channels = 2    # stéreo
     nb_bytes = 1       # taille d'un échantillon : 1 octet = 8 bits
@@ -66,7 +64,7 @@ for gamme in gammes :
         j+=1
         if not os.path.exists("Sounds/"+notes[i]+str(gamme[0])+".wav"):
             print("Generating {0}/{1} (Sounds/{2}.wav)".format(j, n_note, notes[i]+str(gamme[0])))
-            threads.append(threading.Thread(target=create_note_wav, args=(gamme[0],notes[i],gamme[i],2*gamme[i])))
+            threads.append(threading.Thread(target=create_note_wav, args=(notes[i]+str(gamme[0]),gamme[i],2*gamme[i])))
             threads[-1].start()
             #create_note_wav(gamme[0],notes[i],gamme[i],2*gamme[i])
 for thread in threads :
