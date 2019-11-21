@@ -67,6 +67,7 @@ def save_wav(filename,data,framerate):
         # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
         if data[i]<-32767 : data[i]=-32767
         elif data[i]>32767: data[i]=32767
+        data[i]=bytes(data[i])
     data_str = b''.join(data)
     file.writeframes(data_str)  # codage et écriture échantillon 16 bits signés
     print("saving WAV file : '"+filename+"' done !")
@@ -84,6 +85,11 @@ def save_wav(filename,data,framerate):
 '''
 def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):
     data =[int(30000*math.cos(2*math.pi*f*i/framerate)) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
+    save_wav(file,data,framerate)
+    return data
+
+def wav_chord(file ='chord.wav',frequencies=[],framerate=8000,duration=2):
+    data =[int(sum([0]+[int(30000*math.cos(2*math.pi*frequencies[j]*i/framerate)) for j in frequencies])) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
     save_wav(file,data,framerate)
     return data
 
