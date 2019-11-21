@@ -78,8 +78,8 @@ class MainUI (Tk):
         #frame2 = LabelFrame(frame0, text="Génération des accords", padx=20, pady=20);
         #frame2.pack(fill="both", side="right", expand="yes")
         #label2 = Label(frame2, text="Générer accords ici").pack()
-
-        chordsel = ChordSelector(IHM, [], master=frame0,text="ChordSelector", padx=20, pady=20)
+        speaker = Speaker()
+        chordsel = ChordSelector(IHM, [speaker], master=frame0,text="ChordSelector", padx=20, pady=20)
         chordsel.create_UI()
         chordsel.pack(fill="both", side="right", expand="yes")
 

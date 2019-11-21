@@ -17,6 +17,10 @@ import binascii
 import math
 import random
 import subprocess
+import array
+
+# def byte_encode(string):
+#     return [elem.encode("hex") for elem in string]
 
 """
 (data,framerate) = open_wav(filename):
@@ -53,21 +57,24 @@ def open_wav(filename):
     sampling = fréquence d'échantillonnage : 8000, 11025, 22050, 41 000, 44100 et éventuellement 48000 et 96000
 '''
 def save_wav(filename,data,framerate):
-    file = wave.open("Sounds/"+filename,'w')
+    file = wave.open("Sounds/"+filename,'wb')
     # création en-tête
     channels = 1                                                            # mono
-    n_bytes = 2                                                             # taille d'un échantillon : 2 octets = 16 bits
+    n_bytes = 1                                                             # taille d'un échantillon : 2 octets = 16 bits
     samples = len(data)                                                     # nombre total d'échantillon
     params = (channels,n_bytes,framerate,samples,'NONE','not compressed')   # tuple
     file.setparams(params)                                                  # création de l'en-tête (44 octets)
     # écriture des données
     print('Please wait ...')
+    values = []
     for i in range(0,samples):
-        data[i] = int(data[i]) # au cas où une valeur non entière traînerait...
-        # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
-        if data[i]<-32767 : data[i]=-32767
-        elif data[i]>32767: data[i]=32767
-    data_str = b''.join(data)
+        # data[i] = int(data[i]) # au cas où une valeur non entière traînerait...
+        # # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
+        # if data[i]<-32767 : data[i]=-32767
+        # elif data[i]>32767: data[i]=32767
+        values.append(wave.struct.pack('B', int(128.0 + 127.5*data[i])))
+
+    data_str = b''.join(values)
     file.writeframes(data_str)  # codage et écriture échantillon 16 bits signés
     print("saving WAV file : '"+filename+"' done !")
     file.close()
