@@ -1,6 +1,7 @@
 from UI.frequencies_viewer import View, Signal
 from observer import Subject, Observer
 from Generation.frequencies_db_init import *
+from Utils.wav_audio import *
 
 import sys
 if sys.version_info.major == 2:
@@ -379,9 +380,6 @@ class ChordSelector(NoteRegisterer):
 
         ### self additions
 
-        self.generate_button = Button(self, text="generate chord.wav")
-        self.generate_button.grid(row=3, column=4)
-
         def play_cursig():
             ind = self.left_listbox.curselection()
             if not ind:
@@ -397,5 +395,8 @@ class ChordSelector(NoteRegisterer):
         self.play_button = Button(self, text="Play sound", command=play_cursig)
         self.play_button.grid(row=4, column=1)
 
-        self.playchord_button = Button(self, text="Play chord")
+        def play_chord():
+            wav_chord(file='chord.wav',frequencies=[i.split('_')[1] for i in self.right_listbox.get(0, -1)],framerate=8000,duration=2)
+            subprocess.call(["aplay", "Sounds/chord.wav"])
+        self.playchord_button = Button(self, text="Play chord", command=play_chord)
         self.playchord_button.grid(row=4, column=4)
