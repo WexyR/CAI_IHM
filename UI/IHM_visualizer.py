@@ -376,7 +376,7 @@ class ChordSelector(NoteRegisterer):
             sig = self.noteselector.getCurSignal()
             generation = self.generate_signal_wav(sig, False)
             if(generation == -1):
-                messagebox.showwarning("This sound has not been generated. Listening to this sound will be impossible. Try to generate it again")
+                messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to generate it again")
             self.add_note(validatecallback=validatecallback)
 
 
@@ -401,6 +401,7 @@ class ChordSelector(NoteRegisterer):
         self.play_button.grid(row=4, column=1)
 
         def play_chord():
+
             wav_chord(file='chord.wav',frequencies=[i.split('_')[1] for i in self.right_listbox.get(0, -1)],framerate=8000,duration=2)
             subprocess.call(["aplay", "Sounds/chord.wav"])
         self.playchord_button = Button(self, text="Play chord", command=play_chord)
