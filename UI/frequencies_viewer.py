@@ -71,16 +71,16 @@ class Signal(Subject):
             self.wavname = wavname
             return 1 #already generated file
 
-        try:
-            framerate = 8000
-            wav_values = [30000 * self.harmonize(t/framerate, self.N_harm) for t in range(int(framerate*self.duration))]
-            save_wav(wavname, wav_values, framerate)
+        # try:
+        framerate = 8000
+        wav_values = [self.harmonize(t/framerate, self.N_harm) for t in range(int(framerate*self.duration))]
+        save_wav(wavname, wav_values, framerate)
 
 
-            success = True
-        except Exception as e:
-            print(e)
-            success = False
+        success = True
+        # except Exception as e:
+        #     print(e)
+        #     success = False
 
         if(success):
             self.wavname = wavname

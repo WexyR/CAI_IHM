@@ -3,6 +3,7 @@ from observer import Subject, Observer
 from Generation.frequencies_db_init import *
 from Utils.wav_audio import *
 
+import subprocess
 
 import sys
 if sys.version_info.major == 2:
@@ -336,7 +337,7 @@ class ChordSelector(NoteRegisterer):
             messagebox.showinfo("wav generated", "{0} file has succesfully been generated".format(sig.wavname))
         elif generation_status == -1:
             messagebox.showerror("Generation Error", "Error while generating wav file. Aborting...")
-            
+
             return -1
         elif generation_status == 1:
             is_yes = messagebox.askyesno("Already existing file","Already existing file, do you want to overwrite it ?")
@@ -404,3 +405,13 @@ class ChordSelector(NoteRegisterer):
             subprocess.call(["aplay", "Sounds/chord.wav"])
         self.playchord_button = Button(self, text="Play chord", command=play_chord)
         self.playchord_button.grid(row=4, column=4)
+
+
+class Speaker(Observer):
+    def __init__(self):
+        super().__init__()
+
+    def update(self, sig):
+        if(sig.isplaying):
+            if(os.path.exists("Sounds/"+sig.wavname)):
+                subprocess.call(["aplay", "Sounds/"+sig.wavname])
