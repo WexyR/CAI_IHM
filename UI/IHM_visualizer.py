@@ -6,6 +6,9 @@ from Utils.wav_audio import *
 import subprocess
 
 import sys
+import os
+import re
+
 if sys.version_info.major == 2:
     print(sys.version)
     from Tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
@@ -46,6 +49,48 @@ class ListboxValues(Listbox):
 
         super().delete(start, end)
 
+class WAVmodel(Subject):
+    """model, represent the list of all wav signal"""
+
+    def __init__(self):
+        super().__init__()
+        self.note_wavs = {}
+        self.chord_wav = {}
+
+    def update_data(self, paths=["Sounds/"]):
+        l_dir = []
+        for path in paths:
+            l_dir += [(path,file_name) for file_name in os.listdir(path) if os.isfile(file_name)]
+
+
+        for key in self.note_wavs.keys():
+            if(key[1].split("_")[0] == ""): #doesn't need
+                continue
+            if(key not in l_dir): # file deleted
+                del self.note_wavs[key]
+
+        keys = self.note_wavs.keys()
+        for key in l_dir:
+            if(key not in keys):
+                path, file_name = key
+
+
+    def register_signal(self, signal):
+        keyname = signal.get_wavname_by_data()
+        if(keyname in self.note_wavs.keys()):
+            messagebox.showwarning("Already existing signal", "This signal is already existing. Aborting creation.")
+            return -1
+
+
+
+
+    def get(self, regular_expression=None):
+        """return all wavs which have a match with the regular_expression in the name"""
+        if regular_expression is None:
+            return self.wavs
+        else:
+            pass
+            # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
 
 
 class NoteSelector(LabelFrame):
