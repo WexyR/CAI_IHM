@@ -401,7 +401,10 @@ class ChordSelector(NoteRegisterer):
         self.play_button.grid(row=4, column=1)
 
         def play_chord():
-            wav_chord(file='chord.wav',frequencies=[i.split('_')[1] for i in self.right_listbox.get(0, -1)],framerate=8000,duration=2)
+            wav_chord(file='chord.wav',frequencies= \
+                [int(float(i[0].split('_')[1])) for i in self.right_listbox.get(0, self.right_listbox.size()-1)],\
+                framerate=8000,\
+                duration=min([float(i[0].split('_')[3].split('s')[0]) for i in self.right_listbox.get(0, self.right_listbox.size()-1)]))
             subprocess.call(["aplay", "Sounds/chord.wav"])
         self.playchord_button = Button(self, text="Play chord", command=play_chord)
         self.playchord_button.grid(row=4, column=4)

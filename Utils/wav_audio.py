@@ -103,7 +103,8 @@ def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):
     return data
 
 def wav_chord(file ='chord.wav',frequencies=[],framerate=8000,duration=2):
-    data =[int(sum([0]+[int(math.cos(2*math.pi*frequencies[j]*i/framerate)) for j in frequencies])) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
+    data =[float(sum([0]+[float(math.cos(2*math.pi*j*i/framerate)) for j in frequencies])/len(frequencies)) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
+    print(data)
     save_wav(file,data,framerate)
     return data
 
