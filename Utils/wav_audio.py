@@ -68,13 +68,21 @@ def save_wav(filename,data,framerate):
     print('Please wait ...')
     values = []
     for i in range(0,samples):
+
         # data[i] = int(data[i]) # au cas où une valeur non entière traînerait...
         # # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
         # if data[i]<-32767 : data[i]=-32767
         # elif data[i]>32767: data[i]=32767
-        values.append(wave.struct.pack('B', int(128.0 + 127.5*data[i])))
+        #values.append(wave.struct.pack('B', int(128.0 + 127.5*data[i])))
 
-    data_str = b''.join(values)
+    #data_str = b''.join(values)
+        data[i] = int(data[i]) # au cas où une valeur non entière traînerait...
+        # écrétage si valeur en dehors de l'intervalle [-32767,+32767]
+        if data[i]<-32767 : data[i]=-32767
+        elif data[i]>32767: data[i]=32767
+        data[i]=bytes(data[i])
+    data_str = b''.join(data)
+
     file.writeframes(data_str)  # codage et écriture échantillon 16 bits signés
     print("saving WAV file : '"+filename+"' done !")
     file.close()
@@ -91,6 +99,11 @@ def save_wav(filename,data,framerate):
 '''
 def wav_sinus(file ='sinus.wav',f=440,framerate=8000,duration=2):
     data =[int(30000*math.cos(2*math.pi*f*i/framerate)) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
+    save_wav(file,data,framerate)
+    return data
+
+def wav_chord(file ='chord.wav',frequencies=[],framerate=8000,duration=2):
+    data =[int(sum([0]+[int(30000*math.cos(2*math.pi*frequencies[j]*i/framerate)) for j in frequencies])) for i in range(int(framerate*duration))] # framerate*duration = nombre total d'échantillons
     save_wav(file,data,framerate)
     return data
 
