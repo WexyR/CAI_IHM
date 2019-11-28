@@ -49,13 +49,45 @@ class ListboxValues(Listbox):
 
         super().delete(start, end)
 
+class ListboxValuesObs(ListboxValues, Observer):
+    def __init__(self, master, validategetcallback=None, regex=None, *args, **kwargs):
+        ListboxValues.__init__(self, master, *args, **kwargs)
+        Observer.__init__(self)
+        self.regex = regex
+        self.vgc = validategetcallback
+
+    def update(self, model):
+
+        values = model.get_notewavs(self.regex)
+        l_values = self.get(0, self.size()-1)
+
+        # index_of_deleted_val = sorted([ind for ind, val in l_values if val not in values])
+        # index_of_deleted_val = [v-l2.index(v) for v in index_of_deleted_val]
+        # for ind in index_of_deleted_val:
+        #     self.delete(ind)
+
+        for path, signal in values.items():
+            print(path)
+            if self.vgc is not None:
+                if not self.vgc((path, signal)):
+                    continue
+            if(path[1] not in [signame for signame, sig in self.get(0, self.size()-1)]):
+                self.insert(0, signal)
+
+
+
 class wavSignalsModel(Subject):
     """model, represent the list of all wav signal"""
 
-    def __init__(self):
+    def __init__(self, inner_views=[]):
         super().__init__()
+        if not isinstance(inner_views, list):
+            print("/!\\warning/!\\, depreciation: inner_views arguments is not a list. Automatically converted to list")
+            inner_views = list(inner_views)
+
         self.note_wavs = {}
         self.chord_wav = {}
+        self.inner_views = inner_views
 
     def update_note_data(self, paths=["Sounds/"]):
         l_dir = []
@@ -73,7 +105,7 @@ class wavSignalsModel(Subject):
         for key in l_dir:
             if(key not in self.note_wavs.keys()):
                 info = key[1][:-4].split("_")
-                print(info)
+                # print(info)
                 # try:
                 keyname = info[0]
                 if(keyname == "chord"):
@@ -83,7 +115,7 @@ class wavSignalsModel(Subject):
                     s_index = info[3].find("s")
                     if s_index:
                         info[3] = info[3][:s_index]
-                    duration = int(float(info[3]))
+                    duration = float(info[3])
                     N_harm = int(float(info[2]))
                 else:
                     # print(keynae)
@@ -94,9 +126,13 @@ class wavSignalsModel(Subject):
                 #     print(e)
                 #     continue
 
-
-                self.note_wavs[key] = Signal(frequency=freq, N_harm=N_harm, duration=duration, keyname=keyname)
-
+                s = Signal(frequency=freq, N_harm=N_harm, duration=duration, keyname=keyname)
+                s.set_wavname()
+                for view in self.inner_views:
+                    print(view)
+                    s.attach(view)
+                self.note_wavs[key] = s
+        self.notify()
 
     def register_signal(self, signal, path=""):
         keyname = signal.get_wavname_by_data()
@@ -115,6 +151,7 @@ class wavSignalsModel(Subject):
             return self.note_wavs
         else:
             pass
+            # TODO: return with regex
             # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
 
     def get_chordwavs(self, regular_expression=None):
@@ -123,6 +160,7 @@ class wavSignalsModel(Subject):
             return self.note_wavs
         else:
             pass
+            # TODO: return with regex
             # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
 
 
@@ -275,13 +313,16 @@ class NoteSelector(LabelFrame):
         return None
 
 
-class NoteRegisterer(LabelFrame):
+class SignalsRegisterer(LabelFrame):
     """controler which selector"""
 
-    def __init__(self, noteselector, views, *arg, **kwarg):
-        super().__init__(*arg, **kwarg)
-        assert isinstance(views, list)
+    def __init__(self, master, noteselector, model, views, *arg, **kwarg):
+        super().__init__(master, *arg, **kwarg)
+        if not isinstance(views, list):
+            print("/!\\warning/!\\, depreciation: views arguments is not a list. Automatically converted to list")
+            views = list(views)
         self.noteselector = noteselector
+        self.model = model
         self.views = views
         self.left_listbox = None
         self.right_listbox = None
@@ -307,14 +348,21 @@ class NoteRegisterer(LabelFrame):
 
 
 
-        self.button_toright=Button(self, text="->",command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox))#, command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate)).grid(row=1, column=3)
+        self.button_toright=Button(self, text="->")#,command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox))#, command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate)).grid(row=1, column=3)
         self.button_toright.grid(row=2, column=3)
-        self.button_toleft=Button(self, text="<-",command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox))#, command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values)).grid(row=1, column=2)
+        self.button_toleft=Button(self, text="<-")#,command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox))#, command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values)).grid(row=1, column=2)
         self.button_toleft.grid(row=2, column=2)
 
 
         self.add_button = Button(self, text="AddNote", command=self.add_note)
         self.add_button.grid(row=0, column=1)
+
+        self.left_listbox_label.configure(text="signals")
+        self.right_listbox_label.configure(text="displayed signals")
+
+        self.button_toright.configure(command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate))
+        self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
+
 
     def delete_listbox_values(self, listbox, callback=None, *cbargs, **cbkwargs):
         ind = listbox.curselection()
@@ -344,15 +392,15 @@ class NoteRegisterer(LabelFrame):
         for v in self.views:
             sig.attach(v)
         listbox.insert(0, sig)
-    def empty(self, side="both"):
-        assert isinstance(side, str)
-        side = side.lower()
-        assert side in ("left", "right", "both")
-
-        if side in ("left", "both"):
-            self.left_listbox.delete(0, self.left_listbox.size()-1)
-        if side in ("right", "both"):
-            self.right_listbox.delete(0, self.right_listbox.size()-1)
+    # def empty(self, side="both"):
+    #     assert isinstance(side, str)
+    #     side = side.lower()
+    #     assert side in ("left", "right", "both")
+    #
+    #     if side in ("left", "both"):
+    #         self.left_listbox.delete(0, self.left_listbox.size()-1)
+    #     if side in ("right", "both"):
+    #         self.right_listbox.delete(0, self.right_listbox.size()-1)
 
     def execute_on_elements(self, start, end=None, side="both", callback=None, *args, **kwargs):
         """execute a callback function on some elements of the listboxes
@@ -393,21 +441,29 @@ class NoteRegisterer(LabelFrame):
                     for _, element in elements:
                         callback(element, *args, **kwargs)
 
-class SignalsSelector(NoteRegisterer):
-    def __init__(self, *arg, **kwarg):
-        super().__init__(*arg, **kwarg)
+# class SignalsSelector(NoteRegisterer):
+#     def __init__(self, *arg, **kwarg):
+#         super().__init__(*arg, **kwarg)
+#
+#     def create_UI(self):
+#         super().create_UI()
+#         self.left_listbox_label.configure(text="signals")
+#         self.right_listbox_label.configure(text="displayed signals")
+#
+#         self.button_toright.configure(command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate))
+#         self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
 
-    def create_UI(self):
-        super().create_UI()
-        self.left_listbox_label.configure(text="signals")
-        self.right_listbox_label.configure(text="displayed signals")
-
-        self.button_toright.configure(command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate))
-        self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
-
-class ChordSelector(NoteRegisterer):
-    def __init__(self, *arg, **kwarg):
-        super().__init__(*arg, **kwarg)
+class NoteRegisterer(LabelFrame):
+    def __init__(self, master, noteselector, model, views, *arg, **kwarg):
+        super().__init__(master, *arg, **kwarg)
+        if not isinstance(views, list):
+            print("/!\\warning/!\\, depreciation: views arguments is not a list. Automatically converted to list")
+            views = list(views)
+        self.noteselector = noteselector
+        self.left_listbox = ListboxValuesObs(self, height=5)
+        model.attach(self.left_listbox)
+        self.views = views
+        self.model = model
 
     def generate_signal_wav(self, sig, force_generation):
         generation_status = sig.generate_sound(force=force_generation)
@@ -422,6 +478,14 @@ class ChordSelector(NoteRegisterer):
             if is_yes:
                 return self.generate_signal_wav(sig, True)
 
+    def delete_listbox_values(self, listbox, callback=None, *cbargs, **cbkwargs):
+        ind = listbox.curselection()
+        if not ind:return
+        linename, key = listbox.get(ind[0])
+        if(callback):
+            callback(key, *cbargs, **cbkwargs)
+        listbox.delete(ind[0])
+
     def play_signal_sound(self, sig):
         if(sig.play() == -1):
             messagebox.showwarning("Play", "No file has been found for this note")
@@ -429,37 +493,49 @@ class ChordSelector(NoteRegisterer):
     def create_UI(self):
 
         ### super() modifications
-        super().create_UI()
-        self.left_listbox_label.configure(text="notes")
-        self.right_listbox_label.configure(text="chord")
-        self.right_listbox.configure(height=3)
+        self.left_listbox_label = Label(self, text="notes")
+        self.left_listbox_label.grid(row=1, column=1)
+        self.left_listbox.grid(row=2, column=1)
+        self.left_listbox.bind("<BackSpace>", lambda event,l=self.left_listbox:self.delete_listbox_values(l,Signal.reset_wavname))
 
-        def select_chord_cb():
 
-            if self.right_listbox.size() < 3:
-                self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate)
+        # self.left_listbox_label.configure(text="notes")
+        # self.right_listbox_label.configure(text="chord")
+        # self.right_listbox.configure(height=3)
 
-        self.button_toright.configure(command=select_chord_cb)
-        self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
+        # def select_chord_cb():
+        #
+        #     if self.right_listbox.size() < 3:
+        #         self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate)
 
-        def validatecallback(sig):
-            if sig.keyname is None or sig.keyname == "":
-                messagebox.showerror("Error", "Only note (not frequency) signal can be selected")
-                return False
-            else:
-                return True
+        # self.button_toright.configure(command=select_chord_cb)
+        # self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
+
 
 
         def generate_and_add():
             sig = self.noteselector.getCurSignal()
             generation = self.generate_signal_wav(sig, False)
             if(generation == -1):
-                messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to generate it again")
-            self.add_note(validatecallback=validatecallback)
+                messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to delete it then generate it again")
+            self.model.update_note_data()
+
+        self.add_button = Button(self, text="AddNote", command=generate_and_add)
+        self.add_button.grid(row=0, column=1)
 
 
 
-        self.add_button.configure(command=generate_and_add)
+    # def add_note(self, listbox=None, validatecallback=None, *cbargs, **cbkwargs):
+    #     if listbox is None: listbox=self.left_listbox;
+    #     sig = self.noteselector.getCurSignal()
+    #     if not sig: return -1
+    #     if validatecallback is not None:
+    #         if not validatecallback(sig, *cbargs, **cbkwargs):
+    #             return -2
+    #
+    #     for v in self.views:
+    #         sig.attach(v)
+    #     listbox.insert(0, sig)
 
         ### self additions
 
@@ -485,11 +561,15 @@ class ChordSelector(NoteRegisterer):
         self.playchord_button.grid(row=4, column=4)
 
 
+
+
 class Speaker(Observer):
     def __init__(self):
         super().__init__()
 
     def update(self, sig):
+        print(sig)
         if(sig.isplaying):
             if(os.path.exists("Sounds/"+sig.wavname)):
+                print("test")
                 subprocess.call(["aplay", "Sounds/"+sig.wavname])
