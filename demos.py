@@ -40,6 +40,8 @@ if __name__ == "__main__":
         # chordsel = ChordSelector(IHM, [], text="ChordSelector")
         # chordsel.create_UI()
         # chordsel.pack()
+
+        model.update_note_data(["Sounds/"])
         view.grid(4)
         view.packing()
         mw.mainloop()
