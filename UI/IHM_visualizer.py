@@ -49,7 +49,7 @@ class ListboxValues(Listbox):
 
         super().delete(start, end)
 
-class WAVmodel(Subject):
+class wavSignalsModel(Subject):
     """model, represent the list of all wav signal"""
 
     def __init__(self):
@@ -57,37 +57,70 @@ class WAVmodel(Subject):
         self.note_wavs = {}
         self.chord_wav = {}
 
-    def update_data(self, paths=["Sounds/"]):
+    def update_note_data(self, paths=["Sounds/"]):
         l_dir = []
         for path in paths:
-            l_dir += [(path,file_name) for file_name in os.listdir(path) if os.isfile(file_name)]
+            l_dir += [(path,file_name) for file_name in os.listdir(path) if os.path.isfile(path + file_name) and file_name[-3:]=="wav"]
 
 
         for key in self.note_wavs.keys():
-            if(key[1].split("_")[0] == ""): #doesn't need
+            if(key[1].split("_")[0] == ""): #doesn't need wav
                 continue
             if(key not in l_dir): # file deleted
                 del self.note_wavs[key]
 
-        keys = self.note_wavs.keys()
+        # keys = self.note_wavs.keys()
         for key in l_dir:
-            if(key not in keys):
-                path, file_name = key
+            if(key not in self.note_wavs.keys()):
+                info = key[1][:-4].split("_")
+                print(info)
+                # try:
+                keyname = info[0]
+                if(keyname == "chord"):
+                    continue
+                if(len(info)>1):
+                    freq = float(info[1])
+                    s_index = info[3].find("s")
+                    if s_index:
+                        info[3] = info[3][:s_index]
+                    duration = int(float(info[3]))
+                    N_harm = int(float(info[2]))
+                else:
+                    # print(keynae)
+                    freq = getNoteFreq(keyname)
+                    N_harm = 1
+                    duration = 2
+                # except Exception as e:
+                #     print(e)
+                #     continue
 
 
-    def register_signal(self, signal):
+                self.note_wavs[key] = Signal(frequency=freq, N_harm=N_harm, duration=duration, keyname=keyname)
+
+
+    def register_signal(self, signal, path=""):
         keyname = signal.get_wavname_by_data()
-        if(keyname in self.note_wavs.keys()):
+        if((path, keyname) in self.note_wavs.keys()):
             messagebox.showwarning("Already existing signal", "This signal is already existing. Aborting creation.")
             return -1
 
+        self.note_wavs[(path, keyname)] = signal
 
 
 
-    def get(self, regular_expression=None):
-        """return all wavs which have a match with the regular_expression in the name"""
+
+    def get_notewavs(self, regular_expression=None):
+        """return all note which have a match with the regular_expression in the name"""
         if regular_expression is None:
-            return self.wavs
+            return self.note_wavs
+        else:
+            pass
+            # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
+
+    def get_chordwavs(self, regular_expression=None):
+        """return all chords which have a match with the regular_expression in the name"""
+        if regular_expression is None:
+            return self.note_wavs
         else:
             pass
             # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])

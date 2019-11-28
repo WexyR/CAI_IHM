@@ -99,7 +99,7 @@ class Signal(Subject):
 
 
     def get_wavname_by_data(self):
-        return "{0}_{1:.2f}_{2}_{3}s.wav".format(self.keyname, self.frequency, self.N_harm, self.duration)
+        return "{0}_{1:.2f}_{2}_{3}.wav".format(self.keyname, self.frequency, self.N_harm, self.duration)
 
     def reset_wavname(self):
         self.wavname = None
