@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 
 from tkinter import Frame,Button,Label
 from observer import Observer

@@ -1,5 +1,9 @@
 from tkinter import Tk,Frame
 
+from UI.Widgets.Piano.piano_model import *
+from UI.Widgets.Piano.piano_view import *
+from UI.Widgets.Piano.piano_controller import *
+
 class Piano :
     '''piano widget'''
     def __init__(self,parent,octaves, key_w=50, key_h=220) :

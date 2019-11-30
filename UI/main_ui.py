@@ -5,7 +5,7 @@ from tkinter import Tk,Button,Label,Menu,Toplevel,messagebox
 from tkinter.ttk import Notebook,Frame,LabelFrame
 from tkinter import filedialog
 
-from UI.piano_mvc import *
+from UI.Widgets.Piano.piano_widget import *
 from UI.IHM_visualizer import *
 import Utils.wav_create_notes_from_frequencies_db
 
