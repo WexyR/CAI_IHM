@@ -8,7 +8,8 @@ class Subject(object):
     def attach(self, obs):
         if not hasattr(obs,"update"):
             raise ValueError("Observer must have an update() method")
-        self.observers.append(obs)
+        if not obs in self.observers:
+            self.observers.append(obs)
     def detach(self, obs):
         if obs in self.observers :
             self.observers.remove(obs)
@@ -16,4 +17,3 @@ class Subject(object):
 class Observer:
     def update(self, subject):
         raise NotImplementedError
-

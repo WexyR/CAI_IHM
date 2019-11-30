@@ -103,7 +103,10 @@ class Signal(Subject):
 
     def reset_wavname(self):
         self.wavname = None
-        notify()
+        self.notify()
+
+    def set_wavname(self):
+        self.wavname = self.get_wavname_by_data()
 
 class View(Observer):
     def __init__(self,parent,bg="white",width=600,height=300):
