@@ -10,64 +10,6 @@ from Utils.wav_audio import *
 from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
 from tkinter import filedialog
 
-class ListboxValues(Listbox):
-    """Listbox widget but also save variables in a list (not just the __str__ value)"""
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, **kwargs)
-        self.values = []
-
-    def insert(self, *arg, **kwargs):
-        super().insert(*arg, **kwargs)
-        self.values.insert(*arg, **kwargs)
-
-    def get(self, start, end=None):
-        if not isinstance(start, int): raise TypeError("start must be integer")
-        if not isinstance(end, int) and end is not None: raise TypeError("end must be integer or None")
-        names = super().get(start, end)
-        if end is not None:
-            return [(names[i], self.values[i]) for i in range(start,end+1)]
-        else:
-            return (names, self.values[start])
-
-    def delete(self, start, end=None):
-        if not isinstance(start, int): raise TypeError("start must be integer")
-        if not isinstance(end, int) and end is not None: raise TypeError("end must be integer or None")
-
-        if end is not None:
-            for i in range(start, end+1):
-                del self.values[start]
-        else:
-            del self.values[start]
-
-        super().delete(start, end)
-
-class ListboxValuesObs(ListboxValues, Observer):
-    def __init__(self, master, validategetcallback=None, regex=None, *args, **kwargs):
-        ListboxValues.__init__(self, master, *args, **kwargs)
-        Observer.__init__(self)
-        self.regex = regex
-        self.vgc = validategetcallback
-
-    def update(self, model):
-
-        values = model.get_notewavs(self.regex)
-        l_values = self.get(0, self.size()-1)
-
-        # index_of_deleted_val = sorted([ind for ind, val in l_values if val not in values])
-        # index_of_deleted_val = [v-l2.index(v) for v in index_of_deleted_val]
-        # for ind in index_of_deleted_val:
-        #     self.delete(ind)
-
-        for path, signal in values.items():
-            print(path)
-            if self.vgc is not None:
-                if not self.vgc((path, signal)):
-                    continue
-            if(path[1] not in [signame for signame, sig in self.get(0, self.size()-1)]):
-                self.insert(0, signal)
-
-
-
 class wavSignalsModel(Subject):
     """model, represent the list of all wav signal"""
 
