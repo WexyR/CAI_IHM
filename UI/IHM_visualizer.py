@@ -1,22 +1,14 @@
-from UI.frequencies_viewer import View, Signal
-from observer import Subject, Observer
-from Generation.frequencies_db_init import *
-from Utils.wav_audio import *
-
 import subprocess
-
 import sys
 import os
 import re
 
-if sys.version_info.major == 2:
-    print(sys.version)
-    from Tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
-    import tkFileDialog as filedialog
-else:
-    print(sys.version)
-    from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
-    from tkinter import filedialog
+from UI.frequencies_viewer import View, Signal
+from observer import Subject, Observer
+from Generation.frequencies_db_init import *
+from Utils.wav_audio import *
+from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
+from tkinter import filedialog
 
 class ListboxValues(Listbox):
     """Listbox widget but also save variables in a list (not just the __str__ value)"""
@@ -305,8 +297,6 @@ class NoteSelector(LabelFrame):
         update_form_disable()
         update_selection()
 
-
-
     def getCurSignal(self):
         if(self.cursig):
             return self.cursig
@@ -363,7 +353,6 @@ class SignalsRegisterer(LabelFrame):
         self.button_toright.configure(command=lambda:self.move_listbox_value(self.left_listbox, self.right_listbox, Signal.generate))
         self.button_toleft.configure(command=lambda:self.move_listbox_value(self.right_listbox, self.left_listbox, Signal.unset_values))
 
-
     def delete_listbox_values(self, listbox, callback=None, *cbargs, **cbkwargs):
         ind = listbox.curselection()
         if not ind:return
@@ -392,6 +381,7 @@ class SignalsRegisterer(LabelFrame):
         for v in self.views:
             sig.attach(v)
         listbox.insert(0, sig)
+
     # def empty(self, side="both"):
     #     assert isinstance(side, str)
     #     side = side.lower()
