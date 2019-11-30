@@ -1,11 +1,8 @@
-import sys
-import collections
 import subprocess
 import os
 
-from tkinter import Tk,Frame,Button,Label
-from tkinter import filedialog
-from observer import *
+from tkinter import Frame,Button,Label
+from observer import Observer
 
 class Screen(Observer):
     '''piano widget view'''

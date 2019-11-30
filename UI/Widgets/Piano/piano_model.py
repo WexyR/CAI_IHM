@@ -1,11 +1,5 @@
-import sys
 import collections
-import subprocess
-import os
-
-from tkinter import Tk,Frame,Button,Label
-from tkinter import filedialog
-from observer import *
+from observer import Subject
 
 class Octave(Subject) :
     '''piano widget model'''
