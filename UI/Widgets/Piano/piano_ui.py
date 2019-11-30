@@ -4,8 +4,8 @@ from UI.Widgets.Piano.piano_model import *
 from UI.Widgets.Piano.piano_view import *
 from UI.Widgets.Piano.piano_controller import *
 
-class Piano :
-    '''piano widget'''
+class PianoUI :
+    '''The fully integrated piano widget. It integrate multiple instance of a piano MVP'''
     def __init__(self,parent,octaves, key_w=50, key_h=220) :
         self.parent=parent
         self.octaves=[]
