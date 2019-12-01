@@ -3,7 +3,7 @@
 ## Requirements
 
 - python3
-- python3-qt
+- python3-tkinter
 - alsa-utils
 
 ## Running the application
