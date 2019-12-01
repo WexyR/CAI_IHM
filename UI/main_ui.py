@@ -89,11 +89,11 @@ class MainUI (Tk):
 
         sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="signal")
         sr.create_UI()
-        sr.pack(fill="both", side="left")
+        sr.pack(fill="both", side="left", expand="yes")
 
         nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="note")
         nr.create_UI()
-        nr.pack(fill="both", side="right")
+        nr.pack(fill="both", side="right", expand="yes")
 
         model.update_note_data()
 
