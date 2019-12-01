@@ -14,6 +14,7 @@ from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionM
 from tkinter import filedialog
 
 # TODO: Remove unnecessary import
+
 class NoteRegisterer(LabelFrame):
     def __init__(self, master, noteselector, model, views, *arg, **kwarg):
         super().__init__(master, *arg, **kwarg)
@@ -81,8 +82,8 @@ class NoteRegisterer(LabelFrame):
                 messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to delete it then generate it again")
             self.model.update_note_data()
 
-            self.add_button = Button(self, text="AddNote", command=generate_and_add)
-            self.add_button.grid(row=0, column=1)
+        self.add_button = Button(self, text="Générer Son", command=generate_and_add)
+        self.add_button.grid(row=0, column=1)
 
 
 

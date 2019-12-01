@@ -88,11 +88,11 @@ class MainUI (Tk):
         frame1 = Frame(frame0)
         frame1.pack(fill="both", side="bottom", expand="yes")
 
-        sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="signal")
+        sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="Signaux")
         sr.create_UI()
         sr.pack(fill="both", side="left", expand="yes")
 
-        nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="note")
+        nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="Notes")
         nr.create_UI()
         nr.pack(fill="both", side="right", expand="yes")
 
@@ -133,10 +133,10 @@ class MainUI (Tk):
                 except Exception as e:
                     print(e)
             regen_data()
-            ss.execute_on_elements(0, -1, callback=Signal.unset_values)
-            ss.empty()
-            chordsel.execute_on_elements(0, -1, callback=Signal.reset_wavname)
-            chordsel.empty()
+            #ss.execute_on_elements(0, -1, callback=Signal.unset_values)
+            #ss.empty()
+            #chordsel.execute_on_elements(0, -1, callback=Signal.reset_wavname)
+            #chordsel.empty()
         edition_menu.add_command(label="Nettoyer Fichiers Générés", command=reset_data)
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
 

@@ -57,7 +57,7 @@ class SignalsRegisterer(LabelFrame):
         self.button_toleft.grid(row=2, column=2)
 
 
-        self.add_button = Button(self, text="AddNote", command=self.add_note)
+        self.add_button = Button(self, text="Générer Signal", command=self.add_note)
         self.add_button.grid(row=0, column=1)
 
         self.left_listbox_label.configure(text="signals")
