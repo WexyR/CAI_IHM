@@ -21,7 +21,7 @@ class Signal(Subject):
 
     def __str__(self):
         if self.wavname is None:
-            return self.keyname + " f:" + str(int(self.frequency)) + " N:" + str(self.N_harm)
+            return self.get_wavname_by_data()[:-4]
         else:
             return self.wavname
 
@@ -93,7 +93,7 @@ class Signal(Subject):
 
 
     def get_wavname_by_data(self):
-        return "{0}_{1:.2f}_{2}_{3}s.wav".format(self.keyname, self.frequency, self.N_harm, self.duration)
+        return "{0}_{1:.2f}_{2}_{3}_{4}_{5}.wav".format(self.keyname, self.frequency, self.N_harm, self.duration, self.magnitude, self.phase)
 
     def reset_wavname(self):
         self.wavname = None
