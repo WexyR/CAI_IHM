@@ -3,6 +3,8 @@ import sys
 import os
 import re
 
+
+from Utils.signal import *
 from Utils.observer import Subject, Observer
 from Generation.frequencies_db_init import *
 from Utils.wav_audio import *
