@@ -166,7 +166,7 @@ class MainUI (Tk):
             webbrowser.open("https://github.com/WexyR/CAI_IHM/issues")
         help_menu.add_command(label="Support", command = support_cb)
         def credits_cb():
-            webbrowser.open("https://github.com/WexyR/CAI_IHM/graphs/pulse")
+            webbrowser.open("https://github.com/WexyR/CAI_IHM/pulse")
         help_menu.add_command(label="Crédits", command=credits_cb)
         def help_cb():
             webbrowser.open("file://"+os.getcwd()+"/README.md")
