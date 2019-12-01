@@ -18,9 +18,10 @@ class SignalViewer(Observer):
         self.units=1
         self.canvas.bind("<Configure>",self.resize)
 
-    def update(self, subject=None):
+    def update(self, subject):
         print("View : update()")
         print(subject)
+        # print(args)
         if "id"+str(id(subject)) not in self.signals.keys():
             print("update not in keys")
             self.signals["id"+str(id(subject))] = subject

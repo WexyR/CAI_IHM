@@ -9,6 +9,7 @@ class Subject(object):
         if not hasattr(obs,"update"):
             raise ValueError("Observer must have an update() method")
         if not obs in self.observers:
+            print(obs)
             self.observers.append(obs)
     def detach(self, obs):
         if obs in self.observers :

@@ -21,6 +21,8 @@ class Signal(Subject):
 
     def __str__(self):
         if self.wavname is None:
+            if(self.keyname):
+                return self.keyname+".wav"
             return self.get_wavname_by_data()[:-4]
         else:
             return self.wavname
@@ -46,6 +48,7 @@ class Signal(Subject):
         Tech = period/samples
         print("Tech",Tech,period,samples)
         self.values = [(t*Tech,self.harmonize(t*Tech, self.N_harm)) for t in range(int(samples)+1)]
+        print(self)
         self.notify()
         return self.values
 
@@ -99,5 +102,9 @@ class Signal(Subject):
         self.wavname = None
         self.notify()
 
-    def set_wavname(self):
-        self.wavname = self.get_wavname_by_data()
+    def set_wavname(self, name=None):
+        if name is None:
+            self.wavname = self.get_wavname_by_data()
+        else:
+            self.wavname = name
+        return self.wavname

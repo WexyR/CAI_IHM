@@ -6,17 +6,19 @@ from UI.Widgets.Piano.piano_controller import *
 
 class PianoUI :
     '''The fully integrated piano widget. It integrate multiple instance of a piano MVP'''
-    def __init__(self,parent,octaves, key_w=50, key_h=220) :
+    def __init__(self,parent,octaves, key_w=50, key_h=220, signalsModel=None) :
         self.parent=parent
         self.octaves=[]
+        self.signalsModel = signalsModel
         self.frame=Frame(self.parent,bg="yellow")
         for octave in range(octaves) :
             self.create_octave(self.frame,octave+2, key_w=key_w, key_h=key_h)
+
     def create_octave(self,parent,degree=3, key_w=50, key_h=220) :
         frame=Frame(parent,bg="green")
         model=Octave(degree)
         self.octaves.append(model)
-        control=Keyboard(frame,model, key_w=key_w, key_h=key_h)
+        control=Keyboard(frame,model, key_w=key_w, key_h=key_h, signalsModel=self.signalsModel)
         view=Screen(frame)
         model.attach(view)
         view.get_screen().pack()

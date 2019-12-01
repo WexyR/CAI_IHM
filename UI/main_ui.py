@@ -76,6 +76,9 @@ class MainUI (Tk):
         IHM.create_UI()
         IHM.pack(fill="both", side="top", expand="yes")
 
+
+        sigmod = SignalsModel(inner_views=[self.plotter])
+        sigmod.update_note_data()
         ######### Left: notes
         #frame1 = Frame(frame0, padx=20, pady=20);
         #frame1.pack(fill="both", side="left", expand="yes")
@@ -106,7 +109,7 @@ class MainUI (Tk):
         subframe_menu.add(frame4, text="Clavier")
 
         octaves = 3
-        piano = PianoUI(frame4, octaves, 45, 210)
+        piano = PianoUI(frame4, octaves, 45, 210, sigmod)
         piano.packing()
 
         ######################################################################
