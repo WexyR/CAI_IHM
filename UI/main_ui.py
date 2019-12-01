@@ -10,7 +10,7 @@ from UI.IHM_visualizer import *
 import Utils.wav_create_notes_from_frequencies_db
 
 class MainUI (Tk):
-    """This is the main UI class. It is responsible for the module linking."""
+    """This is the main UI class. It contains an instance of PianoUI, SignalViewerUI and SignalGeneratorUI."""
 
     def on_closing(self):
         if messagebox.askokcancel("Avertissement fermeture", "Voulez-vous vraiment quitter l'application?"):
