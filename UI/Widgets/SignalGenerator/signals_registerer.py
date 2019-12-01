@@ -3,10 +3,13 @@ import sys
 import os
 import re
 
-from UI.frequencies_viewer import View, Signal
-from observer import Subject, Observer
-from Generation.frequencies_db_init import *
+from UI.Widgets.SignalListbox.listbox_values import *
+
+from Utils.observer import Subject, Observer
 from Utils.wav_audio import *
+
+from Generation.frequencies_db_init import *
+
 from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
 from tkinter import filedialog
 

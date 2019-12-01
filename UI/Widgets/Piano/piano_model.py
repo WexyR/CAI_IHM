@@ -1,5 +1,5 @@
 import collections
-from observer import Subject
+from Utils.observer import Subject
 
 class Octave(Subject) :
     '''piano widget model'''

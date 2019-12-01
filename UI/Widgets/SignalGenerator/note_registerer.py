@@ -3,10 +3,13 @@ import sys
 import os
 import re
 
-from UI.frequencies_viewer import View, Signal
-from observer import Subject, Observer
-from Generation.frequencies_db_init import *
+from Utils.observer import Subject, Observer
 from Utils.wav_audio import *
+
+from UI.Widgets.SignalListbox.listbox_values_observer import *
+
+from Generation.frequencies_db_init import *
+
 from tkinter import Tk, Frame, LabelFrame, StringVar, IntVar, DoubleVar, OptionMenu, Checkbutton, Spinbox, Label, Button, Listbox, Radiobutton, Scale, Entry, messagebox
 from tkinter import filedialog
 
@@ -71,49 +74,49 @@ class NoteRegisterer(LabelFrame):
 
 
 
-    def generate_and_add():
-        sig = self.noteselector.getCurSignal()
-        generation = self.generate_signal_wav(sig, False)
-        if(generation == -1):
-            messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to delete it then generate it again")
-        self.model.update_note_data()
+        def generate_and_add():
+            sig = self.noteselector.getCurSignal()
+            generation = self.generate_signal_wav(sig, False)
+            if(generation == -1):
+                messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to delete it then generate it again")
+            self.model.update_note_data()
 
-    self.add_button = Button(self, text="AddNote", command=generate_and_add)
-    self.add_button.grid(row=0, column=1)
-
-
-
-    # def add_note(self, listbox=None, validatecallback=None, *cbargs, **cbkwargs):
-    #     if listbox is None: listbox=self.left_listbox;
-    #     sig = self.noteselector.getCurSignal()
-    #     if not sig: return -1
-    #     if validatecallback is not None:
-    #         if not validatecallback(sig, *cbargs, **cbkwargs):
-    #             return -2
-    #
-    #     for v in self.views:
-    #         sig.attach(v)
-    #     listbox.insert(0, sig)
-
-    ### self additions
-
-    def play_cursig():
-        ind = self.left_listbox.curselection()
-        if not ind:
-            messagebox.showerror("Error", "No note selected")
-            return
-        linename, sig = self.left_listbox.get(ind[0])
-        if(sig):
-            self.play_signal_sound(sig)
-        else:
-            messagebox.showerror("Error", "No signal found")
+            self.add_button = Button(self, text="AddNote", command=generate_and_add)
+            self.add_button.grid(row=0, column=1)
 
 
-    self.play_button = Button(self, text="Play sound", command=play_cursig)
-    self.play_button.grid(row=4, column=1)
 
-    def play_chord():
-        wav_chord(file='chord.wav',frequencies=[i.split('_')[1] for i in self.right_listbox.get(0, -1)],framerate=8000,duration=2)
-        subprocess.call(["aplay", "Sounds/chord.wav"])
-    self.playchord_button = Button(self, text="Play chord", command=play_chord)
-    self.playchord_button.grid(row=4, column=4)
+        # def add_note(self, listbox=None, validatecallback=None, *cbargs, **cbkwargs):
+        #     if listbox is None: listbox=self.left_listbox;
+        #     sig = self.noteselector.getCurSignal()
+        #     if not sig: return -1
+        #     if validatecallback is not None:
+        #         if not validatecallback(sig, *cbargs, **cbkwargs):
+        #             return -2
+        #
+        #     for v in self.views:
+        #         sig.attach(v)
+        #     listbox.insert(0, sig)
+
+        ### self additions
+
+        def play_cursig():
+            ind = self.left_listbox.curselection()
+            if not ind:
+                messagebox.showerror("Error", "No note selected")
+                return
+            linename, sig = self.left_listbox.get(ind[0])
+            if(sig):
+                self.play_signal_sound(sig)
+            else:
+                messagebox.showerror("Error", "No signal found")
+
+
+        self.play_button = Button(self, text="Play sound", command=play_cursig)
+        self.play_button.grid(row=4, column=1)
+
+        def play_chord():
+            wav_chord(file='chord.wav',frequencies=[i.split('_')[1] for i in self.right_listbox.get(0, -1)],framerate=8000,duration=2)
+            subprocess.call(["aplay", "Sounds/chord.wav"])
+        self.playchord_button = Button(self, text="Play chord", command=play_chord)
+        self.playchord_button.grid(row=4, column=4)

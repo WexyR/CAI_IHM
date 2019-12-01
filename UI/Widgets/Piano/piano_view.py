@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from tkinter import Frame,Button,Label
-from observer import Observer
+from Utils.observer import Observer
 
 class Screen(Observer):
     '''piano widget view'''

@@ -1,7 +1,7 @@
 import sys, os
 from math import sin,pi
 from random import choice
-from observer import *
+from Utils.observer import *
 from Utils.signal import *
 from Utils.wav_audio import save_wav
 from tkinter import Tk,Canvas, messagebox
