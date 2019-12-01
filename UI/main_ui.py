@@ -5,9 +5,20 @@ from tkinter import Tk,Button,Label,Menu,Toplevel,messagebox
 from tkinter.ttk import Notebook,Frame,LabelFrame
 from tkinter import filedialog
 
-from UI.Widgets.Piano.piano_widget import *
-from UI.IHM_visualizer import *
-import Utils.wav_create_notes_from_frequencies_db
+from UI.piano_ui import *
+
+from UI.Widgets.Piano.piano_model import *
+from UI.Widgets.Piano.piano_view import *
+from UI.Widgets.Piano.piano_controller import *
+
+from UI.Widgets.SignalViewer.signal_viewer import *
+
+from UI.Widgets.SignalGenerator.note_selector import *
+from UI.Widgets.SignalGenerator.note_registerer import *
+from UI.Widgets.SignalGenerator.signals_registerer import *
+
+from Utils.speaker import *
+from Utils.signals_model import *
 
 class MainUI (Tk):
     """This is the main UI class. It contains an instance of PianoUI, SignalViewerUI and SignalGeneratorUI."""
@@ -48,7 +59,7 @@ class MainUI (Tk):
         self.plotter_frame.geometry("500x310+"+str(int(w/2.0+250))+"+"+str(int(h/2.0-310)))
         self.plotter_frame.title("Affichage des notes");
         self.plotter_frame.protocol("WM_DELETE_WINDOW", on_plotter_frame_closing)
-        self.plotter=View(self.plotter_frame)
+        self.plotter=SignalViewer(self.plotter_frame)
         self.plotter.grid(4)
         self.plotter.packing()
         #label3 = Label(self.plotter_frame, text="Affichage ici").pack()
@@ -70,18 +81,18 @@ class MainUI (Tk):
         #frame1.pack(fill="both", side="left", expand="yes")
         #label1 = Label(frame1, text="Générer note ici").pack()
 
-        ss = SignalsSelector(IHM, [self.plotter], master=frame0, text="SignalSelector", padx=20, pady=20)
-        ss.create_UI()
-        ss.pack(fill="both", side="left", expand="yes")
+        #ss = SignalsSelector(IHM, [self.plotter], master=frame0, text="SignalSelector", padx=20, pady=20)
+        #ss.create_UI()
+        #ss.pack(fill="both", side="left", expand="yes")
 
         ######### Right: accords
         #frame2 = LabelFrame(frame0, text="Génération des accords", padx=20, pady=20);
         #frame2.pack(fill="both", side="right", expand="yes")
         #label2 = Label(frame2, text="Générer accords ici").pack()
         speaker = Speaker()
-        chordsel = ChordSelector(IHM, [speaker], master=frame0,text="ChordSelector", padx=20, pady=20)
-        chordsel.create_UI()
-        chordsel.pack(fill="both", side="right", expand="yes")
+        #chordsel = ChordSelector(IHM, [speaker], master=frame0,text="ChordSelector", padx=20, pady=20)
+        #chordsel.create_UI()
+        #chordsel.pack(fill="both", side="right", expand="yes")
 
 
 
@@ -95,7 +106,7 @@ class MainUI (Tk):
         subframe_menu.add(frame4, text="Clavier")
 
         octaves = 3
-        piano = Piano(frame4, octaves, 45, 210)
+        piano = PianoUI(frame4, octaves, 45, 210)
         piano.packing()
 
         ######################################################################
