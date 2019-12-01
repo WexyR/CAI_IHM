@@ -6,6 +6,7 @@ class Octave(Subject) :
     def __init__(self,degree=3) :
         Subject.__init__(self)
         self.degree=degree
+        self.current_key = None
         self.set_gamme(degree)
     def set_gamme(self,degree=3) :
         self.degree=degree
@@ -19,6 +20,10 @@ class Octave(Subject) :
         return self.gamme
     def get_degree(self) :
         return self.degree
-    def notify(self,key) :
+    def change_key(self, key):
+        self.current_key = key
+        self.notify()
+        self.current_key = None
+    def notify(self) :
         for obs in self.observers:
-            obs.update(self,key)
+            obs.update(self)

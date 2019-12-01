@@ -15,7 +15,10 @@ class Screen(Observer):
         self.info.pack()
     def get_screen(self) :
         return self.screen
-    def update(self,model,key="C") :
+    def update(self,model) :
+        key = model.current_key
+        if not key:
+            return
         if __debug__:
             if key not in model.gamme.keys()  :
                 raise AssertionError

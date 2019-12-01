@@ -29,7 +29,7 @@ class Keyboard :
                 button.place(width=key_w,height=key_h,x=key_w*dx_white,y=0)
                 dx_white=dx_white+1
     def play_note(self,key) :
-        self.model.notify(key)
+        self.model.change_key(key)
     def get_keyboard(self) :
         return self.keyboard
     def get_degrees(self) :
