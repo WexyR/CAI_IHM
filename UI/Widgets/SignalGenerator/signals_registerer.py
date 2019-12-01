@@ -7,6 +7,7 @@ from UI.Widgets.SignalListbox.listbox_values import *
 
 from Utils.observer import Subject, Observer
 from Utils.wav_audio import *
+from Utils.signal import *
 
 from Generation.frequencies_db_init import *
 
