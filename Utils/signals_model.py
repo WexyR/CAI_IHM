@@ -66,7 +66,6 @@ class SignalsModel(Subject):
                 s = Signal(frequency=freq, N_harm=N_harm, duration=duration, keyname=keyname)
                 s.set_wavname(key[1])
                 for view in self.inner_views:
-                    print("here it is", view)
                     s.attach(view)
                 self.note_wavs[key] = s
         self.notify()
@@ -108,8 +107,8 @@ class SignalsModel(Subject):
             # TODO: return with regex
             # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
 
-    def execute_on_sigs(self, regular_expression, callback, *cbargs, **cbkwargs):
-        sigs = self.get_notewavs(dirpath, file_name).values()
-        print(sigs)
-        for sig in sigs:
-            callback(sig, *cbargs, **cbkwargs)
+    # def execute_on_sigs(self, regular_expression, callback, *cbargs, **cbkwargs):
+    #     sigs = self.get_notewavs(dirpath, file_name).values()
+    #     print(sigs)
+    #     for sig in sigs:
+    #         callback(sig, *cbargs, **cbkwargs)

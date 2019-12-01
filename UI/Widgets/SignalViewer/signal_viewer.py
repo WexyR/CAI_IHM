@@ -20,7 +20,6 @@ class SignalViewer(Observer):
 
     def update(self, subject):
         print("View : update()")
-        print(subject)
         # print(args)
         if "id"+str(id(subject)) not in self.signals.keys():
             print("update not in keys")
@@ -35,7 +34,6 @@ class SignalViewer(Observer):
             color = signal.color
         else:
             color= "red"
-        print(name)
         if (signal.values is None or len(signal.values)==0):
             print("values is None")
             self.canvas.delete(name)
@@ -43,10 +41,9 @@ class SignalViewer(Observer):
         w,h=self.width,self.height
         signal_id=None
         if signal.values and len(signal.values) > 1:
-            print(self.units)
             plot = [(x*w,h/2.0*(1-y/(self.units/2.0))) for (x, y) in signal.values]
             signal_id=self.canvas.create_line(plot, fill=color, smooth=1, width=3,tags=name)
-            print(signal_id)
+            
         return signal_id
 
     def grid(self,steps=2):
