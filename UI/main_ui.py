@@ -150,8 +150,15 @@ class MainUI (Tk):
 
         menu_bar.add_cascade(label="Fenêtre", menu=window_menu)
         help_menu = Menu(menu_bar, tearoff=0)
-        help_menu.add_command(label="Support")
-        help_menu.add_command(label="Crédits")
+        def support_cb():
+            webbrowser.open("https://github.com/WexyR/CAI_IHM/issues")
+        help_menu.add_command(label="Support", command = support_cb)
+        def credits_cb():
+            webbrowser.open("https://github.com/WexyR/CAI_IHM/graphs/contributors")
+        help_menu.add_command(label="Crédits", command=credits_cb)
+        def help_cb():
+            webbrowser.open("file://"+os.getcwd()+"/README.md")
+        help_menu.add_command(label="Aide", command=help_cb)
         menu_bar.add_cascade(label="Aide", menu=help_menu)
 
     def toggleToplevel(level):
