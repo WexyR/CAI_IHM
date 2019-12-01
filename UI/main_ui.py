@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import webbrowser
 
 from tkinter import Tk,Button,Label,Menu,Toplevel,messagebox
 from tkinter.ttk import Notebook,Frame,LabelFrame
@@ -165,7 +166,7 @@ class MainUI (Tk):
             webbrowser.open("https://github.com/WexyR/CAI_IHM/issues")
         help_menu.add_command(label="Support", command = support_cb)
         def credits_cb():
-            webbrowser.open("https://github.com/WexyR/CAI_IHM/graphs/contributors")
+            webbrowser.open("https://github.com/WexyR/CAI_IHM/graphs/pulse")
         help_menu.add_command(label="Crédits", command=credits_cb)
         def help_cb():
             webbrowser.open("file://"+os.getcwd()+"/README.md")
