@@ -20,7 +20,7 @@ class Octave(Subject) :
         return self.gamme
     def get_degree(self) :
         return self.degree
-    def change_key(self, key):
+    def piano_key(self, key):
         self.current_key = key
         self.notify()
         self.current_key = None

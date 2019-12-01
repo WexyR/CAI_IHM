@@ -64,7 +64,7 @@ class SignalsModel(Subject):
                 #     continue
 
                 s = Signal(frequency=freq, N_harm=N_harm, duration=duration, keyname=keyname)
-                s.set_wavname()
+                s.set_wavname(key[1])
                 for view in self.inner_views:
                     print(view)
                     s.attach(view)
@@ -82,14 +82,16 @@ class SignalsModel(Subject):
 
 
 
-    def get_notewavs(self, regular_expression=None):
+    def get_notewavs(self, dirpath=None, file_name=None):
         """return all note which have a match with the regular_expression in the name"""
-        if regular_expression is None:
+        if dirpath is None or file_name is None:
             return self.note_wavs
         else:
-            pass
-            # TODO: return with regex
-            # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
+            result = dict()
+            for fullpath, sig in self.note_wavs.items():
+                if(fullpath == (dirpath, file_name)):
+                    result[fullpath] = sig
+            return result
 
     def get_chordwavs(self, regular_expression=None):
         """return all chords which have a match with the regular_expression in the name"""
@@ -99,3 +101,7 @@ class SignalsModel(Subject):
             pass
             # TODO: return with regex
             # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
+
+    def piano_key(self, key):
+        for sig in self.get_notewavs("/Sounds", key+".wav"):
+            sig.generate()
