@@ -12,7 +12,7 @@ from tkinter import filedialog
 
 # TODO: Remove unnecessary import
 
-class wavSignalsModel(Subject):
+class SignalsModel(Subject):
     """model, represent the list of all wav signal"""
 
     def __init__(self, inner_views=[]):
