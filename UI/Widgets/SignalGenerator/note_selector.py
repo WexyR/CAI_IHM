@@ -64,7 +64,9 @@ class NoteSelector(LabelFrame):
         self.note_or_freq = 0
         frequency_var = StringVar()
         duration = StringVar()
+        duration.set("1.0")
         magnitude_var = StringVar()
+        magnitude_var.set("0.5")
         phase_var = StringVar()
 
         def update_selection():
