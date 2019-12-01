@@ -22,8 +22,8 @@ class Octave(Subject) :
         return self.degree
     def piano_key(self, key):
         self.current_key = key
+        print("new key value: ", self.current_key)
         self.notify()
-        self.current_key = None
-    def notify(self) :
-        for obs in self.observers:
-            obs.update(self)
+    # def notify(self) :
+    #     for obs in self.observers:
+    #         obs.update(self)

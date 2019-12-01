@@ -48,6 +48,7 @@ class Signal(Subject):
         Tech = period/samples
         print("Tech",Tech,period,samples)
         self.values = [(t*Tech,self.harmonize(t*Tech, self.N_harm)) for t in range(int(samples)+1)]
+        print(self)
         self.notify()
         return self.values
 
