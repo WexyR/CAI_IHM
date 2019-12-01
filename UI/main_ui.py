@@ -20,6 +20,8 @@ from UI.Widgets.SignalGenerator.signals_registerer import *
 from Utils.speaker import *
 from Utils.signals_model import *
 
+import Generation.wav_create_notes_from_frequencies_db
+
 class MainUI (Tk):
     """This is the main UI class. It contains an instance of PianoUI, SignalViewerUI and SignalGeneratorUI."""
 
@@ -62,7 +64,13 @@ class MainUI (Tk):
         self.plotter=SignalViewer(self.plotter_frame)
         self.plotter.grid(4)
         self.plotter.packing()
-        #label3 = Label(self.plotter_frame, text="Affichage ici").pack()
+
+        ######################################################################
+        #                         Speaker
+        ######################################################################
+
+        self.speaker = Speaker()
+        model = SignalsModel(inner_views=[self.plotter, self.speaker])
 
         ######################################################################
         #                         Mode Generation
@@ -76,29 +84,18 @@ class MainUI (Tk):
         IHM.create_UI()
         IHM.pack(fill="both", side="top", expand="yes")
 
+        frame1 = Frame(frame0)
+        frame1.pack(fill="both", side="bottom", expand="yes")
 
-        sigmod = SignalsModel(inner_views=[self.plotter])
-        sigmod.update_note_data()
-        ######### Left: notes
-        #frame1 = Frame(frame0, padx=20, pady=20);
-        #frame1.pack(fill="both", side="left", expand="yes")
-        #label1 = Label(frame1, text="Générer note ici").pack()
+        sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="signal")
+        sr.create_UI()
+        sr.pack(fill="both", side="left")
 
-        #ss = SignalsSelector(IHM, [self.plotter], master=frame0, text="SignalSelector", padx=20, pady=20)
-        #ss.create_UI()
-        #ss.pack(fill="both", side="left", expand="yes")
+        nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="note")
+        nr.create_UI()
+        nr.pack(fill="both", side="right")
 
-        ######### Right: accords
-        #frame2 = LabelFrame(frame0, text="Génération des accords", padx=20, pady=20);
-        #frame2.pack(fill="both", side="right", expand="yes")
-        #label2 = Label(frame2, text="Générer accords ici").pack()
-        speaker = Speaker()
-        #chordsel = ChordSelector(IHM, [speaker], master=frame0,text="ChordSelector", padx=20, pady=20)
-        #chordsel.create_UI()
-        #chordsel.pack(fill="both", side="right", expand="yes")
-
-
-
+        model.update_note_data()
 
         ######################################################################
         #                          Mode Clavier
@@ -109,7 +106,7 @@ class MainUI (Tk):
         subframe_menu.add(frame4, text="Clavier")
 
         octaves = 3
-        piano = PianoUI(frame4, octaves, 45, 210, sigmod)
+        piano = PianoUI(frame4, octaves, 45, 210, model)
         piano.packing()
 
         ######################################################################
@@ -123,8 +120,8 @@ class MainUI (Tk):
         ###################
         edition_menu = Menu(menu_bar, tearoff=0)
         def regen_data():
-            Utils.wav_create_notes_from_frequencies_db.generate()
-        edition_menu.add_command(label="Recharger Tout", command=regen_data)
+            Generation.wav_create_notes_from_frequencies_db.generate()
+        edition_menu.add_command(label="Recharger Fichiers Sons", command=regen_data)
         def reset_data():
             folder = os.path.realpath(os.curdir)+"/Sounds"
             for f in os.listdir(folder):
@@ -139,7 +136,7 @@ class MainUI (Tk):
             ss.empty()
             chordsel.execute_on_elements(0, -1, callback=Signal.reset_wavname)
             chordsel.empty()
-        edition_menu.add_command(label="Rétablir Défaut", command=reset_data)
+        edition_menu.add_command(label="Nettoyer Fichiers Générés", command=reset_data)
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
 
         #############
@@ -159,7 +156,7 @@ class MainUI (Tk):
         def reset_view():
             self.geometry("1000x620+"+str(int(w/2.0-750))+"+"+str(int(h/2.0-310)))
             self.plotter_frame.geometry("500x310+"+str(int(w/2.0+250))+"+"+str(int(h/2.0-310)))
-        window_menu.add_command(label="Rétablir défaut", command=reset_view)
+        window_menu.add_command(label="Vue Par Défaut", command=reset_view)
         ##################
 
         menu_bar.add_cascade(label="Fenêtre", menu=window_menu)
