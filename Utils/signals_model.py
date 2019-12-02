@@ -119,12 +119,13 @@ class SignalsModel(Subject):
 
         self.note_wavs[(path, keyname)] = signal
 
-    def get_notewavs(self, dirpath=None, regex=None):
+    def get_wavs(self, dirpath=None, regex=None):
         """return all note which have a match with the regular_expression in the name"""
-        if regex is None:
-            return self.note_wavs
+        if dirpath is None and regex is None:
+            return self.note_wavs, self.chord_wavs
         else:
-            result=dict()
+            note_result=dict()
+            chord_result=dict()
             for fullpath, sig in self.note_wavs.items():
 
                 dpath, file_name = fullpath
@@ -132,20 +133,16 @@ class SignalsModel(Subject):
                     continue
                 if not re.match(regex, file_name):
                     continue
-                result[fullpath] = sig
-            return result
+                note_result[fullpath] = sig
 
-    def get_chordwavs(self, regular_expression=None):
-        """return all chords which have a match with the regular_expression in the name"""
-        if regular_expression is None:
-            return self.note_wavs
-        else:
-            pass
-            # TODO: return with regex
-            # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
+            for fullpath, chord in self.chord_wavs.items():
 
-    # def execute_on_sigs(self, regular_expression, callback, *cbargs, **cbkwargs):
-    #     sigs = self.get_notewavs(dirpath, file_name).values()
-    #     print(sigs)
-    #     for sig in sigs:
-    #         callback(sig, *cbargs, **cbkwargs)
+                dpath, file_name = fullpath
+                if dpath != dirpath:
+                    continue
+                if not re.match(regex, file_name):
+                    continue
+                chord_result[fullpath] = chord
+
+
+            return note_result, chord_result
