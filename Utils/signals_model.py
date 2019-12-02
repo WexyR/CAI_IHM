@@ -22,52 +22,90 @@ class SignalsModel(Subject):
             inner_views = list(inner_views)
 
         self.note_wavs = {}
-        self.chord_wav = {}
+        self.chord_wavs = {}
         self.inner_views = inner_views
 
-    # TODO: @ShinySilver Add Chord support. split |; len==1?signal:chord
+    def strinfo_to_infodict(self, strinfo):
+        """decompile signal info in strinfo"""
+        dot = strinfo.find('.wav')
+        if(dot != -1):
+            strinfo = strinfo[:dot]
+        info = strinfo.split('_')
+        print(info, len(info))
+        info_dict = dict()
+        if(re.match("[A-G]#?[0-9]", info[0])):
+            info_dict["keyname"] = info[0]
+
+
+        if(len(info) == 6):
+            info_dict["frequency"] = float(info[1])
+            info_dict["N_harm"] = int(float(info[2]))
+            info_dict["duration"] = float(info[3])
+            info_dict["magnitude"] = float(info[4])
+            info_dict["phase"] = float(info[5])
+        else:
+            if("keyname" in info_dict.keys()):
+                info_dict["frequency"] = getNoteFreq(info_dict["keyname"])
+            else:
+                return None
+        return info_dict
+
     def update_note_data(self, paths=["Sounds/"]):
         l_dir = []
         for path in paths:
             l_dir += [(path,file_name) for file_name in os.listdir(path) if os.path.isfile(path + file_name) and file_name[-3:]=="wav"]
 
-
+        # check deleted note wav file
         for key in self.note_wavs.keys():
+            if(len(key[1].split('|')) != 1): #chord
+                continue
             if(key[1].split("_")[0] == ""): #doesn't need wav
                 continue
             if(key not in l_dir): # file deleted
                 del self.note_wavs[key]
 
-        # keys = self.note_wavs.keys()
-        for key in l_dir:
-            if(key not in self.note_wavs.keys()):
-                info = key[1][:-4].split("_")
-                # print(info)
-                # try:
-                keyname = info[0]
-                if(keyname == "chord"):
-                    continue
-                if(len(info)>1):
-                    freq = float(info[1])
-                    s_index = info[3].find("s")
-                    if s_index:
-                        info[3] = info[3][:s_index]
-                    duration = float(info[3])
-                    N_harm = int(float(info[2]))
-                else:
-                    # print(keynae)
-                    freq = getNoteFreq(keyname)
-                    N_harm = 1
-                    duration = 2
-                # except Exception as e:
-                #     print(e)
-                #     continue
+        # check deleted note wav file
+        for key in self.chord_wavs.keys():
+            if(len(key[1].split('|')) == 1): #note
+                continue
+            if(key not in l_dir): # file deleted
+                del self.chord_wavs[key]
 
-                s = Signal(frequency=freq, N_harm=N_harm, duration=duration, keyname=keyname)
-                s.set_wavname(key[1])
-                for view in self.inner_views:
-                    s.attach(view)
-                self.note_wavs[key] = s
+
+
+
+
+        for key in l_dir:
+            if(len(key[1].split('|')) == 1):
+                if(key not in self.note_wavs.keys()):
+                    sig_parameters = self.strinfo_to_infodict(key[1])
+                    if sig_parameters is None:
+                        print("unable to decompile the file {0}{1}".format(*key))
+                        continue
+
+                    s = Signal(**sig_parameters)
+                    s.set_wavname(key[1])
+                    for view in self.inner_views:
+                        s.attach(view)
+                    self.note_wavs[key] = s
+            else:
+                if(key not in self.note_wavs.keys()):
+                    sig_infos = [sig.split('_') for sig in key[1].split('|')]
+                    sigs = []
+                    for sig_info in sig_infos:
+                        sig_parameters = self.strinfo_to_infodict(sig_info)
+                        if sig_parameters is None:
+                            print("unable to decompile the file {0}{1}".format(*key))
+                            break
+                        sigs.append(Signal(**sig_parameters))
+                    chord = Chord(signals=sigs)
+                    chord.set_wavname(key[1])
+                    for view in self.inner_views:
+                        s.attach(view)
+                    self.chord_wavs[key] = s
+
+
+
         self.notify()
 
     def register_signal(self, signal, path=""):
