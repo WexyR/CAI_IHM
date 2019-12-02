@@ -25,6 +25,7 @@ class SignalsModel(Subject):
         self.chord_wav = {}
         self.inner_views = inner_views
 
+    # TODO: @ShinySilver Add Chord support. split |; len==1?signal:chord
     def update_note_data(self, paths=["Sounds/"]):
         l_dir = []
         for path in paths:
