@@ -15,20 +15,21 @@ class Chord(Subject):
         Subject.__init__(self)
 
         self.set(signals)
-        self.signals.sort()
+        self.signals.sort(key=lambda x: x.wavname)
 
         self.values = None
         self.wavname = None
         self.isplaying = False
 
     def __str__(self):
-        return "|".join([str(s)[:-4] for s in self.signals.sort()])+".wav"
+        return "|".join([str(s)[:-4] for s in self.signals])+".wav"
 
     def set(self, signals=[]):
         self.signals = signals
         self.duration = max([s.duration for s in self.signals])
 
     def generate(self, period=2, samples=100):
+        Tech = period/samples
         self.values = [(t*Tech,sum([s.harmonize(t*Tech, s.N_harm) for s in self.signals])) for t in range(int(samples)+1)]
         print(self)
         self.notify()
@@ -40,9 +41,9 @@ class Chord(Subject):
             self.notify()
 
     def generate_sound(self, force=False):
-        wavname = self.get_wavname_by_data()
+        wavname = self.__str__()
 
-        existing_file = os.path.exists("Sounds/"+wavname)
+        existing_file = os.path.exists("Sounds/Chords/"+wavname)
 
         print(existing_file)
 
@@ -52,7 +53,7 @@ class Chord(Subject):
 
         try:
             framerate = 8000
-            wav_values = [sum([s.harmonize(t/framerate, s.N_harm) if t<s.duration else 0 for s in self.signals]) for t in range(int(framerate*self.duration))]
+            wav_values = [(sum([s.harmonize(t/framerate, s.N_harm) if t<s.duration else 0 for s in self.signals])/len(self.signals)) for t in range(int(framerate*self.duration))]
             save_wav(wavname, wav_values, framerate)
 
 
