@@ -4,6 +4,7 @@ import os
 import re
 
 from Utils.signal import *
+from Utils.chord import *
 from Utils.observer import Subject, Observer
 from Generation.frequencies_db_init import *
 from Utils.wav_audio import *
@@ -90,7 +91,7 @@ class SignalsModel(Subject):
                     self.note_wavs[key] = s
             else:
                 if(key not in self.note_wavs.keys()):
-                    sig_infos = [sig.split('_') for sig in key[1].split('|')]
+                    sig_infos = key[1].split('|')
                     sigs = []
                     for sig_info in sig_infos:
                         sig_parameters = self.strinfo_to_infodict(sig_info)
@@ -98,6 +99,7 @@ class SignalsModel(Subject):
                             print("unable to decompile the file {0}{1}".format(*key))
                             break
                         sigs.append(Signal(**sig_parameters))
+                    print(sigs)
                     chord = Chord(signals=sigs)
                     chord.set_wavname(key[1])
                     for view in self.inner_views:

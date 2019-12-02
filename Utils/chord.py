@@ -15,7 +15,7 @@ class Chord(Subject):
         Subject.__init__(self)
 
         self.set(signals)
-        self.signals.sort(key=lambda x: x.wavname)
+        self.signals.sort(key=lambda x: x.get_wavname_by_data())
 
         self.values = None
         self.wavname = None
@@ -76,6 +76,9 @@ class Chord(Subject):
             return 0
         else:
             return -1
+
+    def set_wavname(self, wavname):
+        self.wavname = wavname
 
     #def get_wavname_by_data(self):
     #    return "{0}_{1:.2f}_{2}_{3}_{4}_{5}.wav".format(self.keyname, self.frequency, self.N_harm, self.duration, self.magnitude, self.phase)
