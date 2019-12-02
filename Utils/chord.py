@@ -22,7 +22,7 @@ class Chord(Subject):
         self.isplaying = False
 
     def __str__(self):
-        return "|".join([str(s) for s in self.signals])+".wav"
+        return "|".join([str(s)[:-4] for s in self.signals.sort()])+".wav"
 
     def set(self, signals=[]):
         self.signals = signals
