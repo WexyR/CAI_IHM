@@ -3,7 +3,6 @@ import sys
 import os
 import re
 
-
 from Utils.signal import *
 from Utils.observer import Subject, Observer
 from Generation.frequencies_db_init import *
@@ -117,9 +116,6 @@ class SignalsModel(Subject):
 
         self.note_wavs[(path, keyname)] = signal
 
-
-
-
     def get_notewavs(self, dirpath=None, regex=None):
         """return all note which have a match with the regular_expression in the name"""
         if regex is None:
@@ -135,7 +131,6 @@ class SignalsModel(Subject):
                     continue
                 result[fullpath] = sig
             return result
-
 
     def get_chordwavs(self, regular_expression=None):
         """return all chords which have a match with the regular_expression in the name"""

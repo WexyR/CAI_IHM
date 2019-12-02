@@ -71,7 +71,6 @@ class MainUI (Tk):
         ######################################################################
 
         self.speaker = Speaker()
-        model = SignalsModel(inner_views=[self.plotter, self.speaker])
 
         ######################################################################
         #                         Mode Generation
@@ -88,15 +87,19 @@ class MainUI (Tk):
         frame1 = Frame(frame0)
         frame1.pack(fill="both", side="bottom", expand="yes")
 
+        model = SignalsModel(inner_views=[self.plotter, self.speaker])
         sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="Signaux")
         sr.create_UI()
         sr.pack(fill="both", side="left", expand="yes")
 
-        nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="Notes")
+
+        chords_model = SignalsModel(inner_views=[self.plotter, self.speaker])
+        nr = NoteRegisterer(frame1, IHM, model, chords_model, [self.speaker], text="Notes")
         nr.create_UI()
         nr.pack(fill="both", side="right", expand="yes")
 
         model.update_note_data()
+        chords_model.update_note_data(paths=["Sounds/Chords/"])
 
         ######################################################################
         #                          Mode Clavier
