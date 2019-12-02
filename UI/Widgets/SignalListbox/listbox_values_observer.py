@@ -16,15 +16,16 @@ from tkinter import filedialog
 # TODO: Remove unnecessary import
 
 class ListboxValuesObs(ListboxValues, Observer):
-    def __init__(self, master, validategetcallback=None, regex=None, *args, **kwargs):
+    def __init__(self, master, valuemode=0, validategetcallback=None, regex=None, *args, **kwargs):
         ListboxValues.__init__(self, master, *args, **kwargs)
         Observer.__init__(self)
         self.regex = regex
         self.vgc = validategetcallback
+        self.valuemode = valuemode
 
     def update(self, model):
 
-        values = model.get_notewavs(self.regex)
+        values = model.get_notewavs(self.regex)[self.valuemode]
         l_values = self.get(0, self.size()-1)
 
         # index_of_deleted_val = sorted([ind for ind, val in l_values if val not in values])
