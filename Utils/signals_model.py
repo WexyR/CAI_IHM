@@ -16,7 +16,7 @@ from tkinter import filedialog
 class SignalsModel(Subject):
     """model, represent the list of all wav signal"""
 
-    def __init__(self, inner_views=[]):
+    def __init__(self, inner_views=[], paths=["Sounds/", "Sounds/Chords"]):
         super().__init__()
         if not isinstance(inner_views, list):
             print("/!\\warning/!\\, depreciation: inner_views arguments is not a list. Automatically converted to list")
@@ -25,6 +25,7 @@ class SignalsModel(Subject):
         self.note_wavs = {}
         self.chord_wavs = {}
         self.inner_views = inner_views
+        self.paths = paths
 
     def strinfo_to_infodict(self, strinfo):
         """decompile signal info in strinfo"""
@@ -51,9 +52,9 @@ class SignalsModel(Subject):
                 return None
         return info_dict
 
-    def update_note_data(self, paths=["Sounds/"]):
+    def update_data(self):
         l_dir = []
-        for path in paths:
+        for path in self.paths:
             l_dir += [(path,file_name) for file_name in os.listdir(path) if os.path.isfile(path + file_name) and file_name[-3:]=="wav"]
 
         # check deleted note wav file
