@@ -17,21 +17,23 @@ from tkinter import filedialog
 # TODO: Remove unnecessary import
 
 class NoteRegisterer(LabelFrame):
-    def __init__(self, master, noteselector, model, chords_model, views, *arg, model_path=["Sounds/"], chords_model_path=["Sounds/Chords/"], **kwarg):
+    def __init__(self, master, noteselector, model, views, *arg, model_path=["Sounds/", "Sounds/Chords/"], **kwarg):
         super().__init__(master, *arg, **kwarg)
         if not isinstance(views, list):
             print("/!\\warning/!\\, depreciation: views arguments is not a list. Automatically converted to list")
             views = list(views)
         self.noteselector = noteselector
+
         self.left_listbox = ListboxValuesObs(self, height=5)
         model.attach(self.left_listbox)
+
         self.right_listbox = ListboxValuesObs(self, height=5)
-        chords_model.attach(self.right_listbox)
+        model.attach(self.right_listbox)
+
         self.views = views
+
         self.model = model
         self.model_path = model_path
-        self.chords_model = chords_model
-        self.chords_model_path = chords_model_path
 
     def generate_signal_wav(self, sig, force_generation):
         generation_status = sig.generate_sound(force=force_generation)

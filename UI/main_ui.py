@@ -94,12 +94,11 @@ class MainUI (Tk):
 
 
         chords_model = SignalsModel(inner_views=[self.plotter, self.speaker])
-        nr = NoteRegisterer(frame1, IHM, model, chords_model, [self.speaker], text="Notes")
+        nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="Notes")
         nr.create_UI()
         nr.pack(fill="both", side="right", expand="yes")
 
-        model.update_note_data()
-        chords_model.update_note_data(paths=["Sounds/Chords/"])
+        model.update_data()
 
         ######################################################################
         #                          Mode Clavier
