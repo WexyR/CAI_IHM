@@ -24,10 +24,10 @@ class NoteRegisterer(LabelFrame):
             views = list(views)
         self.noteselector = noteselector
 
-        self.left_listbox = ListboxValuesObs(self, height=5)
+        self.left_listbox = ListboxValuesObs(self, valuemode=0, height=5)
         model.attach(self.left_listbox)
 
-        self.right_listbox = ListboxValuesObs(self, height=5)
+        self.right_listbox = ListboxValuesObs(self, valuemode=1, height=5)
         model.attach(self.right_listbox)
 
         self.views = views
@@ -90,7 +90,7 @@ class NoteRegisterer(LabelFrame):
                 messagebox.showwarning("Generation","La génération d'un accord requiere 2 ou plus notes. Vous pouvez en sélectionner dans la liste 'notes'.")
             chord = Chord(signals=signals)
             chord.generate_sound()
-            self.chords_model.update_note_data(self.chords_model_path)
+            self.chords_model.update_data()
 
         self.add_chord_button = Button(self, text="Générer Accord", command=fuse_and_add)
         self.add_chord_button.grid(row=0, column=3)
