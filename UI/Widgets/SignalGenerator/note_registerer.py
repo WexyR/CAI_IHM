@@ -100,11 +100,11 @@ class NoteRegisterer(LabelFrame):
             if not ind:
                 messagebox.showerror("Error", "No note selected")
                 return
-            linename, sig = self.left_listbox.get(ind[0])
-            if(sig):
-                self.play_signal_sound(sig)
-            else:
-                messagebox.showerror("Error", "No signal found")
+            for sig in [self.left_listbox.get(i)[1] for i in ind]:
+                if(sig):
+                    self.play_signal_sound(sig)
+                else:
+                    messagebox.showerror("Error", "No signal found")
 
         self.play_button = Button(self, text="Play sound", command=play_cursig)
         self.play_button.grid(row=4, column=1)
