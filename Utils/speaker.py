@@ -12,4 +12,4 @@ class Speaker(Observer):
         print(sig)
         if(sig.isplaying):
             if(os.path.exists("Sounds/"+"Chords/"*isinstance(sig, Chord)+sig.wavname)):
-                subprocess.call(["aplay", "Sounds/"+sig.wavname])
+                subprocess.call(["aplay", "Sounds/"+"Chords/"*isinstance(sig, Chord)+sig.wavname])
