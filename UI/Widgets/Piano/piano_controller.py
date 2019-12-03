@@ -32,7 +32,7 @@ class Keyboard :
                 dx_white=dx_white+1
     def play_note(self,key) :
         if(self.signalsModel):
-            note_wavs = self.signalsModel.get_notewavs(dirpath="Sounds/", regex="[A-G]#?[0-9].wav")
+            note_wavs = self.signalsModel.get_wavs(dirpath="Sounds/", regex="[A-G]#?[0-9].wav")
             for sig in note_wavs.values():
                 sig.unset_values()
 
