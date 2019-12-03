@@ -38,23 +38,52 @@ if __name__ == "__main__":
     elif(arg == '2'):
         mw = Tk()
 
-        view=SignalViewer(mw)
-        speaker = Speaker()
-        IHM = NoteSelector(mw)
-        IHM.create_UI()
-        IHM.pack()
-        model = SignalsModel([view, speaker])
-        sr = SignalsRegisterer(mw, IHM, model, [view], text="signal")
-        sr.create_UI()
-        sr.pack()
-        nr = NoteRegisterer(mw, IHM, model, [speaker], text="note")
-        nr.create_UI()
-        nr.pack()
-        # chordsel = ChordSelector(IHM, [], text="ChordSelector")
-        # chordsel.create_UI()
-        # chordsel.pack()
+        ######################################################################
+        #                         Fenêtre Affichage
+        ######################################################################
 
-        model.update_note_data(["Sounds/"])
-        view.grid(4)
-        view.packing()
+        def on_plotter_frame_closing():
+            plotter_frame.withdraw()
+
+        plotter_frame = Toplevel()
+        plotter_frame.geometry("500x310")
+        plotter_frame.title("Affichage des notes");
+        plotter_frame.protocol("WM_DELETE_WINDOW", on_plotter_frame_closing)
+        plotter=SignalViewer(plotter_frame)
+        plotter.grid(4)
+        plotter.packing()
+
+        ######################################################################
+        #                         Speaker
+        ######################################################################
+
+        speaker = Speaker()
+
+        ######################################################################
+        #                         Mode Generation
+        ######################################################################
+
+        frame0 = Frame(mw)
+        frame0.pack()
+        #mw.add(frame0, text="Génération")
+
+        IHM = NoteSelector(frame0)
+        IHM.create_UI()
+        IHM.pack(fill="both", side="top", expand="yes")
+
+        frame1 = Frame(frame0)
+        frame1.pack(fill="both", side="bottom", expand="yes")
+
+        model = SignalsModel(inner_views=[plotter, speaker], paths=["Sounds/", "Sounds/Chords/"])
+        sr = SignalsRegisterer(frame1, IHM, model, [plotter], text="Signaux")
+        sr.create_UI()
+        sr.pack(fill="both", side="left", expand="yes")
+
+
+        chords_model = SignalsModel(inner_views=[plotter, speaker])
+        nr = NoteRegisterer(frame1, IHM, model, [speaker], text="Notes")
+        nr.create_UI()
+        nr.pack(fill="both", side="right", expand="yes")
+
+        model.update_data()
         mw.mainloop()
