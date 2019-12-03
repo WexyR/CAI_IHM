@@ -22,7 +22,7 @@ class Chord(Subject):
         self.isplaying = False
 
     def __str__(self):
-        return "|".join([str(s)[:-4] for s in self.signals])+".wav"
+        return "~".join([str(s)[:-4] for s in self.signals])+".wav"
 
     def set(self, signals=[]):
         self.signals = signals
@@ -54,7 +54,7 @@ class Chord(Subject):
         try:
             framerate = 8000
             wav_values = [(sum([s.harmonize(t/framerate, s.N_harm) if t<s.duration else 0 for s in self.signals])/len(self.signals)) for t in range(int(framerate*self.duration))]
-            save_wav(wavname, wav_values, framerate)
+            save_wav("Chords/"+wavname, wav_values, framerate)
 
 
             success = True

@@ -58,7 +58,7 @@ class SignalsModel(Subject):
 
         # check deleted note wav file
         for key in self.note_wavs.keys():
-            if(len(key[1].split('|')) != 1): #chord
+            if(len(key[1].split('~')) != 1): #chord
                 continue
             if(key[1].split("_")[0] == ""): #doesn't need wav
                 continue
@@ -67,7 +67,7 @@ class SignalsModel(Subject):
 
         # check deleted note wav file
         for key in self.chord_wavs.keys():
-            if(len(key[1].split('|')) == 1): #note
+            if(len(key[1].split('~')) == 1): #note
                 continue
             if(key not in l_dir): # file deleted
                 del self.chord_wavs[key]
@@ -77,7 +77,7 @@ class SignalsModel(Subject):
 
 
         for key in l_dir:
-            if(len(key[1].split('|')) == 1):
+            if(len(key[1].split('~')) == 1):
                 if(key not in self.note_wavs.keys()):
                     sig_parameters = self.strinfo_to_infodict(key[1])
                     if sig_parameters is None:
@@ -91,7 +91,7 @@ class SignalsModel(Subject):
                     self.note_wavs[key] = s
             else:
                 if(key not in self.note_wavs.keys()):
-                    sig_infos = key[1].split('|')
+                    sig_infos = key[1].split('~')
                     sigs = []
                     for sig_info in sig_infos:
                         sig_parameters = self.strinfo_to_infodict(sig_info)
