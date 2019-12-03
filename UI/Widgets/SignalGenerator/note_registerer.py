@@ -67,12 +67,12 @@ class NoteRegisterer(LabelFrame):
         self.left_listbox_label.grid(row=1, column=1)
         self.left_listbox.grid(row=2, column=1)
         self.left_listbox.configure(selectmode='multiple')
-        self.left_listbox.bind("<BackSpace>", lambda event,l=self.left_listbox:self.delete_listbox_values(l,Signal.reset_wavname))
+        #self.left_listbox.bind("<BackSpace>", lambda event,l=self.left_listbox:self.delete_listbox_values(l,Signal.reset_wavname))
 
         self.right_listbox_label = Label(self, text="chords")
         self.right_listbox_label.grid(row=1, column=3)
         self.right_listbox.grid(row=2, column=3)
-        self.right_listbox.bind("<BackSpace>", lambda event,l=self.right_listbox:self.delete_listbox_values(l,Signal.reset_wavname))
+        #self.right_listbox.bind("<BackSpace>", lambda event,l=self.right_listbox:self.delete_listbox_values(l,Signal.reset_wavname))
 
         def generate_and_add():
             sig = self.noteselector.getCurSignal()

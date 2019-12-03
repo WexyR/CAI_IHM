@@ -66,11 +66,14 @@ class SignalsModel(Subject):
                 del self.note_wavs[key]
 
         # check deleted note wav file
+        to_remove=[]
         for key in self.chord_wavs.keys():
             if(len(key[1].split('~')) == 1): #note
                 continue
             if(key not in l_dir): # file deleted
-                del self.chord_wavs[key]
+                to_remove+=key
+
+        # TODO: have it works 
 
 
 
