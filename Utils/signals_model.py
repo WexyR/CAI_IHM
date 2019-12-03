@@ -33,7 +33,6 @@ class SignalsModel(Subject):
         if(dot != -1):
             strinfo = strinfo[:dot]
         info = strinfo.split('_')
-        print(info, len(info))
         info_dict = dict()
         if(re.match("[A-G]#?[0-9]", info[0])):
             info_dict["keyname"] = info[0]
@@ -100,7 +99,6 @@ class SignalsModel(Subject):
                             print("unable to decompile the file {0}{1}".format(*key))
                             break
                         sigs.append(Signal(**sig_parameters))
-                    print(sigs)
                     chord = Chord(signals=sigs)
                     chord.set_wavname(key[1])
                     for view in self.inner_views:
