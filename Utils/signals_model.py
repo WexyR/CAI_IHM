@@ -71,11 +71,9 @@ class SignalsModel(Subject):
             if(len(key[1].split('~')) == 1): #note
                 continue
             if(key not in l_dir): # file deleted
-                to_remove+=key
+                del self.chord_wavs[key]
 
-        # TODO: have it works 
-
-
+        # TODO: Have it work pls :(
 
 
 
