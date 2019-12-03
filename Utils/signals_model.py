@@ -129,17 +129,19 @@ class SignalsModel(Subject):
             for fullpath, sig in self.note_wavs.items():
 
                 dpath, file_name = fullpath
-                if dpath != dirpath:
-                    continue
-                if not re.match(regex, file_name):
-                    continue
+                if(dirpath is not None):
+                    if dpath not in dirpath:
+                        continue
+                if(regex is not None):
+                    if not re.match(regex, file_name):
+                        continue
                 note_result[fullpath] = sig
 
             for fullpath, chord in self.chord_wavs.items():
 
                 dpath, file_name = fullpath
                 if(dirpath is not None):
-                    if dpath != dirpath:
+                    if dpath not in dirpath:
                         continue
                 if(regex is not None):
                     if not re.match(regex, file_name):
