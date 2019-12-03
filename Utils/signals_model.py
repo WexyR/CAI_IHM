@@ -138,10 +138,12 @@ class SignalsModel(Subject):
             for fullpath, chord in self.chord_wavs.items():
 
                 dpath, file_name = fullpath
-                if dpath != dirpath:
-                    continue
-                if not re.match(regex, file_name):
-                    continue
+                if(dirpath is not None):
+                    if dpath != dirpath:
+                        continue
+                if(regex is not None):
+                    if not re.match(regex, file_name):
+                        continue
                 chord_result[fullpath] = chord
 
 
