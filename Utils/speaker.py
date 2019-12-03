@@ -11,5 +11,5 @@ class Speaker(Observer):
     def update(self, sig):
         print(sig)
         if(sig.isplaying):
-            if(os.path.exists("Sounds/"+"Chords/"*isinstance(sig, chord)+sig.wavname)):
+            if(os.path.exists("Sounds/"+"Chords/"*isinstance(sig, Chord)+sig.wavname)):
                 subprocess.call(["aplay", "Sounds/"+sig.wavname])

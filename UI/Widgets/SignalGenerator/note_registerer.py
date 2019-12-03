@@ -110,7 +110,7 @@ class NoteRegisterer(LabelFrame):
         self.play_button.grid(row=4, column=1)
 
         def play_chord():
-            chord = self.right_listbox.curselection()[1]
+            chord = self.right_listbox.get(self.right_listbox.curselection()[0])[1]
             if(chord.play() == -1):
                 messagebox.showwarning("Play", "No file has been found for this chord")
             #subprocess.call(["aplay", self.chords_model_path+chord.__str__()])

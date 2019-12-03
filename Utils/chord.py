@@ -20,6 +20,7 @@ class Chord(Subject):
         self.values = None
         self.wavname = None
         self.isplaying = False
+        self.color=color
 
     def __str__(self):
         return "~".join([str(s)[:-4] for s in self.signals])+".wav"
