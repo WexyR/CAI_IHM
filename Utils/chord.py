@@ -15,14 +15,16 @@ class Chord(Subject):
         Subject.__init__(self)
 
         self.set(signals)
-        self.signals.sort(key=lambda x: x.wavname)
+        self.signals.sort(key=lambda x: x.get_wavname_by_data())
 
         self.values = None
         self.wavname = None
         self.isplaying = False
+        self.color=color
+        self.duration = max([s.duration for s in self.signals])
 
     def __str__(self):
-        return "|".join([str(s)[:-4] for s in self.signals])+".wav"
+        return "~".join([str(s)[:-4] for s in self.signals])+".wav"
 
     def set(self, signals=[]):
         self.signals = signals
@@ -53,8 +55,8 @@ class Chord(Subject):
 
         try:
             framerate = 8000
-            wav_values = [(sum([s.harmonize(t/framerate, s.N_harm) if t<s.duration else 0 for s in self.signals])/len(self.signals)) for t in range(int(framerate*self.duration))]
-            save_wav(wavname, wav_values, framerate)
+            wav_values = [(sum([s.harmonize(t/framerate, s.N_harm) if t>s.duration else 0 for s in self.signals])/len(self.signals)) for t in range(int(framerate*self.duration))]
+            save_wav("Chords/"+wavname, wav_values, framerate)
 
 
             success = True
@@ -76,6 +78,9 @@ class Chord(Subject):
             return 0
         else:
             return -1
+
+    def set_wavname(self, wavname):
+        self.wavname = wavname
 
     #def get_wavname_by_data(self):
     #    return "{0}_{1:.2f}_{2}_{3}_{4}_{5}.wav".format(self.keyname, self.frequency, self.N_harm, self.duration, self.magnitude, self.phase)

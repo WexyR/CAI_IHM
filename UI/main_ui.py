@@ -87,19 +87,18 @@ class MainUI (Tk):
         frame1 = Frame(frame0)
         frame1.pack(fill="both", side="bottom", expand="yes")
 
-        model = SignalsModel(inner_views=[self.plotter, self.speaker])
+        model = SignalsModel(inner_views=[self.plotter, self.speaker], paths=["Sounds/", "Sounds/Chords/"])
         sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="Signaux")
         sr.create_UI()
         sr.pack(fill="both", side="left", expand="yes")
 
 
         chords_model = SignalsModel(inner_views=[self.plotter, self.speaker])
-        nr = NoteRegisterer(frame1, IHM, model, chords_model, [self.speaker], text="Notes")
+        nr = NoteRegisterer(frame1, IHM, model, [self.speaker], text="Notes")
         nr.create_UI()
         nr.pack(fill="both", side="right", expand="yes")
 
-        model.update_note_data()
-        chords_model.update_note_data(paths=["Sounds/Chords/"])
+        model.update_data()
 
         ######################################################################
         #                          Mode Clavier
@@ -127,19 +126,16 @@ class MainUI (Tk):
             Generation.wav_create_notes_from_frequencies_db.generate()
         edition_menu.add_command(label="Recharger Fichiers Sons", command=regen_data)
         def reset_data():
-            folder = os.path.realpath(os.curdir)+"/Sounds"
-            for f in os.listdir(folder):
-                file_path = os.path.join(folder, f)
-                try:
-                    if file_path.endswith(".wav",) and os.path.isfile(file_path):
-                        os.unlink(file_path)
-                except Exception as e:
-                    print(e)
+            for folder in [os.path.realpath(os.curdir)+i for i in ["/Sounds", "/Sounds/Chords"]]:
+                for f in os.listdir(folder):
+                    file_path = os.path.join(folder, f)
+                    try:
+                        if file_path.endswith(".wav",) and os.path.isfile(file_path):
+                            os.unlink(file_path)
+                    except Exception as e:
+                        print(e)
             regen_data()
-            #ss.execute_on_elements(0, -1, callback=Signal.unset_values)
-            #ss.empty()
-            #chordsel.execute_on_elements(0, -1, callback=Signal.reset_wavname)
-            #chordsel.empty()
+            model.update_data()
         edition_menu.add_command(label="Nettoyer Fichiers Générés", command=reset_data)
         menu_bar.add_cascade(label="Edition", menu=edition_menu)
 

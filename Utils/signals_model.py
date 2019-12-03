@@ -4,6 +4,7 @@ import os
 import re
 
 from Utils.signal import *
+from Utils.chord import *
 from Utils.observer import Subject, Observer
 from Generation.frequencies_db_init import *
 from Utils.wav_audio import *
@@ -15,7 +16,7 @@ from tkinter import filedialog
 class SignalsModel(Subject):
     """model, represent the list of all wav signal"""
 
-    def __init__(self, inner_views=[]):
+    def __init__(self, inner_views=[], paths=["Sounds/", "Sounds/Chords"]):
         super().__init__()
         if not isinstance(inner_views, list):
             print("/!\\warning/!\\, depreciation: inner_views arguments is not a list. Automatically converted to list")
@@ -24,6 +25,7 @@ class SignalsModel(Subject):
         self.note_wavs = {}
         self.chord_wavs = {}
         self.inner_views = inner_views
+        self.paths = paths
 
     def strinfo_to_infodict(self, strinfo):
         """decompile signal info in strinfo"""
@@ -31,7 +33,6 @@ class SignalsModel(Subject):
         if(dot != -1):
             strinfo = strinfo[:dot]
         info = strinfo.split('_')
-        print(info, len(info))
         info_dict = dict()
         if(re.match("[A-G]#?[0-9]", info[0])):
             info_dict["keyname"] = info[0]
@@ -50,14 +51,14 @@ class SignalsModel(Subject):
                 return None
         return info_dict
 
-    def update_note_data(self, paths=["Sounds/"]):
+    def update_data(self):
         l_dir = []
-        for path in paths:
+        for path in self.paths:
             l_dir += [(path,file_name) for file_name in os.listdir(path) if os.path.isfile(path + file_name) and file_name[-3:]=="wav"]
 
         # check deleted note wav file
         for key in self.note_wavs.keys():
-            if(len(key[1].split('|')) != 1): #chord
+            if(len(key[1].split('~')) != 1): #chord
                 continue
             if(key[1].split("_")[0] == ""): #doesn't need wav
                 continue
@@ -65,18 +66,19 @@ class SignalsModel(Subject):
                 del self.note_wavs[key]
 
         # check deleted note wav file
+        to_remove=[]
         for key in self.chord_wavs.keys():
-            if(len(key[1].split('|')) == 1): #note
+            if(len(key[1].split('~')) == 1): #note
                 continue
             if(key not in l_dir): # file deleted
                 del self.chord_wavs[key]
 
-
+        # TODO: Have it work pls :(
 
 
 
         for key in l_dir:
-            if(len(key[1].split('|')) == 1):
+            if(len(key[1].split('~')) == 1):
                 if(key not in self.note_wavs.keys()):
                     sig_parameters = self.strinfo_to_infodict(key[1])
                     if sig_parameters is None:
@@ -90,7 +92,7 @@ class SignalsModel(Subject):
                     self.note_wavs[key] = s
             else:
                 if(key not in self.note_wavs.keys()):
-                    sig_infos = [sig.split('_') for sig in key[1].split('|')]
+                    sig_infos = key[1].split('~')
                     sigs = []
                     for sig_info in sig_infos:
                         sig_parameters = self.strinfo_to_infodict(sig_info)
@@ -101,8 +103,8 @@ class SignalsModel(Subject):
                     chord = Chord(signals=sigs)
                     chord.set_wavname(key[1])
                     for view in self.inner_views:
-                        s.attach(view)
-                    self.chord_wavs[key] = s
+                        chord.attach(view)
+                    self.chord_wavs[key] = chord
 
 
 
@@ -116,33 +118,34 @@ class SignalsModel(Subject):
 
         self.note_wavs[(path, keyname)] = signal
 
-    def get_notewavs(self, dirpath=None, regex=None):
+    def get_wavs(self, dirpath=None, regex=None):
         """return all note which have a match with the regular_expression in the name"""
-        if regex is None:
-            return self.note_wavs
+        if dirpath is None and regex is None:
+            return self.note_wavs, self.chord_wavs
         else:
-            result=dict()
+            note_result=dict()
+            chord_result=dict()
             for fullpath, sig in self.note_wavs.items():
 
                 dpath, file_name = fullpath
-                if dpath != dirpath:
-                    continue
-                if not re.match(regex, file_name):
-                    continue
-                result[fullpath] = sig
-            return result
+                if(dirpath is not None):
+                    if dpath not in dirpath:
+                        continue
+                if(regex is not None):
+                    if not re.match(regex, file_name):
+                        continue
+                note_result[fullpath] = sig
 
-    def get_chordwavs(self, regular_expression=None):
-        """return all chords which have a match with the regular_expression in the name"""
-        if regular_expression is None:
-            return self.note_wavs
-        else:
-            pass
-            # TODO: return with regex
-            # return set([elem for elem in self.wavs if re.match(regular_expression,elem.wavname)])
+            for fullpath, chord in self.chord_wavs.items():
 
-    # def execute_on_sigs(self, regular_expression, callback, *cbargs, **cbkwargs):
-    #     sigs = self.get_notewavs(dirpath, file_name).values()
-    #     print(sigs)
-    #     for sig in sigs:
-    #         callback(sig, *cbargs, **cbkwargs)
+                dpath, file_name = fullpath
+                if(dirpath is not None):
+                    if dpath not in dirpath:
+                        continue
+                if(regex is not None):
+                    if not re.match(regex, file_name):
+                        continue
+                chord_result[fullpath] = chord
+
+
+            return note_result, chord_result
