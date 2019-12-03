@@ -90,7 +90,7 @@ class NoteRegisterer(LabelFrame):
                 messagebox.showwarning("Generation","La génération d'un accord requiere 2 ou plus notes. Vous pouvez en sélectionner dans la liste 'notes'.")
             chord = Chord(signals=signals)
             chord.generate_sound()
-            self.chords_model.update_data()
+            self.model.update_data()
 
         self.add_chord_button = Button(self, text="Générer Accord", command=fuse_and_add)
         self.add_chord_button.grid(row=0, column=3)

@@ -104,8 +104,8 @@ class SignalsModel(Subject):
                     chord = Chord(signals=sigs)
                     chord.set_wavname(key[1])
                     for view in self.inner_views:
-                        s.attach(view)
-                    self.chord_wavs[key] = s
+                        chord.attach(view)
+                    self.chord_wavs[key] = chord
 
 
 
