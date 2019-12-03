@@ -79,7 +79,7 @@ class NoteRegisterer(LabelFrame):
             generation = self.generate_signal_wav(sig, False)
             if(generation == -1):
                 messagebox.showwarning("Generation","This sound has not been generated. Listening to this sound will be impossible. Try to delete it then generate it again")
-            self.model.update_note_data(self.model_path)
+            self.model.update_data()
 
         self.add_button = Button(self, text="Générer Son", command=generate_and_add)
         self.add_button.grid(row=0, column=1)
