@@ -39,13 +39,13 @@ class SignalsRegisterer(LabelFrame):
 
         self.left_listbox_label = Label(self, text="left_listbox")
         self.left_listbox_label.grid(row=1, column=1)
-        self.left_listbox = ListboxValues(self, height=5)
+        self.left_listbox = ListboxValues(self, height=5, width=30)
         self.left_listbox.grid(row=2, column=1)
         self.left_listbox.bind("<BackSpace>", lambda event,l=self.left_listbox:self.delete_listbox_values(l,Signal.unset_values))
 
         self.right_listbox_label = Label(self, text="right_listbox")
         self.right_listbox_label.grid(row=1, column=4)
-        self.right_listbox = ListboxValues(self, height=5)
+        self.right_listbox = ListboxValues(self, height=5, width=30)
         self.right_listbox.grid(row=2, column=4)
         self.right_listbox.bind("<BackSpace>", lambda event,l=self.right_listbox:self.delete_listbox_values(l,Signal.unset_values))
 
@@ -86,6 +86,7 @@ class SignalsRegisterer(LabelFrame):
     def add_note(self, listbox=None, validatecallback=None, *cbargs, **cbkwargs):
         if listbox is None: listbox=self.left_listbox;
         sig = self.noteselector.getCurSignal()
+        sig.set_wavname(sig.get_wavname_by_data())
         if not sig: return -1
         if validatecallback is not None:
             if not validatecallback(sig, *cbargs, **cbkwargs):

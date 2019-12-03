@@ -28,10 +28,18 @@ if __name__ == "__main__":
         root=Tk()
         root.title("Piano : Nom-Prenom")
         view=SignalViewer(root)
-        s1 = Signal("S1", 1, 1, 0, 0)
-        s1.attach(view)
-        s2 = Signal("S2", 1, 2, 0, 1)
-        s2.attach(view)
+
+        IHM = NoteSelector(root)
+        IHM.create_UI()
+        IHM.pack(fill="both", side="top", expand="yes")
+
+        model = SignalsModel(inner_views=[view], paths=["Sounds/", "Sounds/Chords/"])
+        sr = SignalsRegisterer(root, IHM, model, [view], text="Signaux")
+        sr.create_UI()
+        sr.pack(fill="both", side="top", expand="yes")
+
+
+
         view.grid(4)
         view.packing()
         root.mainloop()
@@ -75,9 +83,9 @@ if __name__ == "__main__":
         frame1.pack(fill="both", side="bottom", expand="yes")
 
         model = SignalsModel(inner_views=[plotter, speaker], paths=["Sounds/", "Sounds/Chords/"])
-        sr = SignalsRegisterer(frame1, IHM, model, [plotter], text="Signaux")
-        sr.create_UI()
-        sr.pack(fill="both", side="left", expand="yes")
+        # sr = SignalsRegisterer(frame1, IHM, model, [plotter], text="Signaux")
+        # sr.create_UI()
+        # sr.pack(fill="both", side="left", expand="yes")
 
 
         chords_model = SignalsModel(inner_views=[plotter, speaker])
