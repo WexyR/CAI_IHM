@@ -27,7 +27,7 @@ class NoteRegisterer(LabelFrame):
         self.left_listbox = ListboxValuesObs(self, dirpath=["Sounds/"], height=5)
         model.attach(self.left_listbox)
 
-        self.right_listbox = ListboxValuesObs(self, dirpath=["Sounds/Chords"], height=5)
+        self.right_listbox = ListboxValuesObs(self, dirpath=["Sounds/Chords/"], height=5)
         model.attach(self.right_listbox)
 
         self.views = views

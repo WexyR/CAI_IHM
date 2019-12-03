@@ -87,7 +87,7 @@ class MainUI (Tk):
         frame1 = Frame(frame0)
         frame1.pack(fill="both", side="bottom", expand="yes")
 
-        model = SignalsModel(inner_views=[self.plotter, self.speaker])
+        model = SignalsModel(inner_views=[self.plotter, self.speaker], paths=["Sounds/", "Sounds/Chords/"])
         sr = SignalsRegisterer(frame1, IHM, model, [self.plotter], text="Signaux")
         sr.create_UI()
         sr.pack(fill="both", side="left", expand="yes")
